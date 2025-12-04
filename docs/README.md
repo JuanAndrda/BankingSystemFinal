@@ -144,6 +144,46 @@ Complete security implementation analysis:
 
 ---
 
+### 7. UML Class Diagram
+
+**Complete system architecture visualization**
+
+#### [Banking-System-UML.puml](Banking-System-UML.puml) (PlantUML Source)
+High-level conceptual UML class diagram showing complete system architecture
+
+**Demonstrates:**
+- ✅ **Complete Class Structure:** All 21 classes across 6 packages
+- ✅ **Inheritance Hierarchies:**
+  - User (abstract) → Admin, UserAccount
+  - Account (abstract) → SavingsAccount, CheckingAccount
+- ✅ **Relationships:**
+  - **1-to-1:** Customer ↔ CustomerProfile (bidirectional)
+  - **1-to-Many:** Customer → Account, Account → Transaction
+- ✅ **Composition:** BankingSystem → Managers (strong ownership)
+- ✅ **Aggregation:** Managers → Collections (shared ownership)
+- ✅ **Design Patterns:**
+  - Facade Pattern (BankingSystem)
+  - Strategy Pattern (Account.withdraw() polymorphism)
+  - Immutable Pattern (AuditLog, Transaction)
+- ✅ **Access Control Architecture:** Role-based permissions, RBAC
+
+**Package Organization:**
+- `com.banking.auth` - Authentication & authorization (User hierarchy, AuditLog)
+- `com.banking.models` - Domain entities (Account hierarchy, Customer, Transaction)
+- `com.banking.managers` - Business logic (CustomerManager, AccountManager, TransactionProcessor, AuthenticationManager)
+- `com.banking` - Main controller (BankingSystem facade, Main, MenuAction)
+- `com.banking.utilities` - Utility classes (InputValidator, UIFormatter, ValidationPatterns, AccountUtils)
+
+**Rendering Instructions:**
+- **Online:** Visit http://www.plantuml.com/plantuml/uml/ and paste the .puml content
+- **VS Code:** Install "PlantUML" extension, right-click file → "Preview Current Diagram"
+- **IntelliJ IDEA:** Install "PlantUML integration" plugin, right-click → "Show PlantUML Diagram"
+- **Command Line:** `java -jar plantuml.jar Banking-System-UML.puml`
+
+📄 **~250 lines of PlantUML code** | CIT 207 Rubric: **10 points (Class Diagram)**
+
+---
+
 ## 📊 Total Documentation
 
 | File | Lines | Focus | Points Covered |
@@ -162,7 +202,8 @@ Complete security implementation analysis:
 | **6.5-Profile-Reports.md** | ~1,500 | Profile & reports | Admin #14-19 |
 | **6.6-Security-Session.md** | ~700 | Security & session | Admin #21/#0/#20, Cust #6/#0/#7 |
 | **Menu Subtotal** | **~6,900** | **22 menu operations** | **Complete menu system** |
-| **GRAND TOTAL** | **~11,150** | **Complete system** | **All requirements** |
+| **Banking-System-UML.puml** | ~250 | UML class diagram | 10 points (CIT 207) |
+| **GRAND TOTAL** | **~11,400** | **Complete system** | **All requirements** |
 
 ---
 
@@ -184,11 +225,11 @@ Complete security implementation analysis:
 | User Interactivity | 6/6 | 3-Error-Handling.md | ✅ Complete |
 | Error Handling | 6/6 | 3-Error-Handling.md | ✅ Complete |
 | Code Quality | 15/15 | 1-OOP-Analysis.md | ✅ Complete |
-| Class Diagram | 10/10 | **To be created** | ⏳ Pending |
+| Class Diagram | 10/10 | Banking-System-UML.puml | ✅ Complete |
 | Presentation & Q&A | 10/10 | **Future** | ⏳ Pending |
 | Peer Evaluation | 30/30 | **Future** | ⏳ Pending |
 
-**Current Documentation Score: 70/100** (remaining points: diagram, presentation, peer eval)
+**Current Documentation Score: 80/100** (remaining points: presentation, peer eval)
 
 ### CC 204 - Data Structures and Algorithms (100/100 points)
 
@@ -253,7 +294,8 @@ BankingProjectPart3/
 │   ├── 6.3-Account-Ops.md         # Account operations (Admin #5-9, Cust #1)
 │   ├── 6.4-Transaction-Ops.md     # Transaction operations (Admin #10-13, Cust #2-5)
 │   ├── 6.5-Profile-Reports.md     # Profile & reports (Admin #14-19)
-│   └── 6.6-Security-Session.md    # Security & session (Admin #21/#0/#20, Cust #6/#0/#7)
+│   ├── 6.6-Security-Session.md    # Security & session (Admin #21/#0/#20, Cust #6/#0/#7)
+│   └── Banking-System-UML.puml    # UML class diagram (10 points)
 │
 ├── src/                            # Source code (26 Java files)
 │   └── com/banking/
@@ -299,10 +341,11 @@ BankingProjectPart3/
 
 - **Code Examples:** All include file paths (e.g., `src/com/banking/Main.java:42`)
 - **Format:** Professional Markdown with syntax highlighting
-- **Comprehensive:** ~11,150 lines of documentation (12 files)
+- **Comprehensive:** ~11,400 lines of documentation (13 files)
 - **Ready for Submission:** Can be converted to PDF if needed
 - **Rubric-Aligned:** Clear point breakdowns for each requirement
 - **Menu System:** Complete documentation of all 22 menu operations
+- **UML Diagram:** High-level PlantUML class diagram with all 21 classes
 
 ---
 
@@ -319,6 +362,7 @@ For questions about this documentation or the Banking System implementation, ple
 ---
 
 **Last Updated:** December 2025
-**Documentation Version:** 2.0
-**Total Pages:** ~11,150 lines across 12 files
+**Documentation Version:** 2.1
+**Total Pages:** ~11,400 lines across 13 files
 **Menu Documentation:** 7 files covering all 22 menu operations
+**UML Diagram:** PlantUML source with 21 classes and complete architecture

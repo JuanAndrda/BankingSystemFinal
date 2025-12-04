@@ -1,0 +1,407 @@
+@startuml Banking System Class Diagram
+
+' ============================================================
+' Banking Management System - UML Class Diagram
+' High-Level Conceptual Design
+' CIT 207 & CC 204 Final Project
+' ============================================================
+
+title Banking Management System - Complete UML Class Diagram
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 80
+
+' ============================================================
+' PACKAGE: com.banking.auth (Authentication & Authorization)
+' ============================================================
+
+package "com.banking.auth" <<Rectangle>> {
+
+    abstract class User <<abstract>> {
+        username
+        password
+        userRole
+        passwordChangeRequired
+        --
+        authenticate()
+        hasPermission()
+        {abstract} getPermissions()
+    }
+
+    class Admin {
+        getPermissions()
+    }
+
+    class UserAccount {
+        linkedCustomerId
+        --
+        getPermissions()
+    }
+
+    enum UserRole <<enumeration>> {
+        ADMIN
+        CUSTOMER
+    }
+
+    class AuditLog {
+        timestamp
+        username
+        userRole
+        action
+        details
+    }
+
+    ' Relationships within auth package
+    User <|-- Admin
+    User <|-- UserAccount
+    User --> UserRole : has
+    AuditLog --> UserRole : uses
+}
+
+' ============================================================
+' PACKAGE: com.banking.models (Domain Model Entities)
+' ============================================================
+
+package "com.banking.models" <<Rectangle>> {
+
+    abstract class Account <<abstract>> {
+        accountNo
+        balance
+        owner
+        transactionHistory
+        --
+        deposit()
+        {abstract} withdraw()
+    }
+
+    class SavingsAccount {
+        interestRate
+        --
+        withdraw()
+        applyInterest()
+    }
+
+    class CheckingAccount {
+        overdraftLimit
+        --
+        withdraw()
+    }
+
+    class Customer {
+        customerId
+        name
+        accounts
+        profile
+        --
+        addAccount()
+        removeAccount()
+    }
+
+    class CustomerProfile {
+        profileId
+        address
+        phone
+        email
+        customer
+    }
+
+    class Transaction {
+        txId
+        fromAccountNo
+        toAccountNo
+        type
+        amount
+        timestamp
+        status
+    }
+
+    enum TransactionType <<enumeration>> {
+        DEPOSIT
+        WITHDRAW
+        TRANSFER
+    }
+
+    ' Relationships within models package
+    Account <|-- SavingsAccount
+    Account <|-- CheckingAccount
+    Transaction --> TransactionType : has
+}
+
+' ============================================================
+' PACKAGE: com.banking.managers (Business Logic Layer)
+' ============================================================
+
+package "com.banking.managers" <<Rectangle>> {
+
+    class CustomerManager {
+        customers
+        validator
+        bankingSystem
+        accountMgr
+        --
+        createCustomer()
+        findCustomer()
+        deleteCustomer()
+        createOrUpdateProfile()
+        handleCreateCustomer()
+        handleViewCustomerDetails()
+        handleViewAllCustomers()
+        handleDeleteCustomer()
+    }
+
+    class AccountManager {
+        customers
+        accountList
+        validator
+        bankingSystem
+        --
+        createAccount()
+        findAccount()
+        deleteAccount()
+        updateOverdraftLimit()
+        applyInterest()
+        sortAccountsByName()
+        sortAccountsByBalance()
+        handleCreateAccount()
+        handleViewAccountDetails()
+        handleViewAllAccounts()
+        handleDeleteAccount()
+    }
+
+    class TransactionProcessor {
+        accountList
+        validator
+        bankingSystem
+        --
+        deposit()
+        withdraw()
+        transfer()
+        getAccountTransactionsAsStack()
+        handleDeposit()
+        handleWithdraw()
+        handleTransfer()
+        handleViewTransactionHistory()
+    }
+
+    class AuthenticationManager {
+        userRegistry
+        auditTrail
+        currentUser
+        --
+        registerUser()
+        login()
+        logout()
+        changePassword()
+        generateUsername()
+        generateTemporaryPassword()
+        logAction()
+        displayAuditTrail()
+    }
+}
+
+' ============================================================
+' PACKAGE: com.banking (Main System Controller)
+' ============================================================
+
+package "com.banking" <<Rectangle>> {
+
+    class BankingSystem {
+        customers
+        accountList
+        validator
+        customerMgr
+        accountMgr
+        txProcessor
+        authManager
+        currentUser
+        --
+        displayAdminMenu()
+        displayCustomerMenu()
+        runConsoleMenu()
+        canAccessAccount()
+        login()
+        logout()
+        registerUser()
+        logAction()
+        startApplication()
+    }
+
+    class Main {
+        {static} main()
+    }
+
+    enum MenuAction <<enumeration>> {
+        CREATE_CUSTOMER
+        VIEW_CUSTOMER_DETAILS
+        VIEW_ALL_CUSTOMERS
+        DELETE_CUSTOMER
+        CREATE_ACCOUNT
+        VIEW_ACCOUNT_DETAILS
+        VIEW_ALL_ACCOUNTS
+        DELETE_ACCOUNT
+        UPDATE_OVERDRAFT_LIMIT
+        DEPOSIT_MONEY
+        WITHDRAW_MONEY
+        TRANSFER_MONEY
+        VIEW_TRANSACTION_HISTORY
+        CREATE_CUSTOMER_PROFILE
+        UPDATE_PROFILE_INFORMATION
+        APPLY_INTEREST
+        SORT_ACCOUNTS_BY_NAME
+        SORT_ACCOUNTS_BY_BALANCE
+        VIEW_AUDIT_TRAIL
+        CHANGE_PASSWORD
+        LOGOUT
+        EXIT_APPLICATION
+    }
+}
+
+' ============================================================
+' PACKAGE: com.banking.utilities (Utility Classes)
+' ============================================================
+
+package "com.banking.utilities" <<Rectangle>> {
+
+    class InputValidator <<utility>> {
+        scanner
+        customerManager
+        accountManager
+        --
+        getValidatedCustomer()
+        getValidatedAccount()
+        getValidatedAccountWithAccessControl()
+        getValidatedAmountWithLabel()
+        getValidatedString()
+        getValidatedEmail()
+        getValidatedPhoneNumber()
+        confirmAction()
+    }
+
+    class UIFormatter <<utility>> {
+        {static} printTopBorder()
+        {static} printMiddleBorder()
+        {static} printBottomBorder()
+        {static} printSuccess()
+        {static} printError()
+        {static} printInfo()
+        {static} printTableHeader()
+        {static} printTableRow()
+        {static} printTableFooter()
+        {static} printSectionHeader()
+    }
+
+    class ValidationPatterns <<utility>> {
+        {static} CUSTOMER_ID_PATTERN
+        {static} ACCOUNT_NO_PATTERN
+        {static} PROFILE_ID_PATTERN
+        {static} EMAIL_PATTERN
+        {static} PHONE_MIN_DIGITS
+        --
+        {static} matchesPattern()
+        {static} isValidPhoneNumber()
+    }
+
+    class AccountUtils <<utility>> {
+        {static} findAccount()
+    }
+}
+
+' ============================================================
+' CROSS-PACKAGE RELATIONSHIPS
+' ============================================================
+
+' Inheritance Relationships (Generalization)
+' Already defined within packages
+
+' Association: Customer ↔ Account (One-to-Many)
+Customer "1" *-- "0..*" Account : owns >
+Account --> Customer : belongs to
+
+' Association: Customer ↔ CustomerProfile (One-to-One Bidirectional)
+Customer "0..1" -- "0..1" CustomerProfile : has/belongs to
+
+' Association: Account ↔ Transaction (One-to-Many)
+Account "1" *-- "0..*" Transaction : has >
+
+' Association: UserAccount → Customer (Linked by ID)
+UserAccount ..> Customer : linked to
+
+' Composition: BankingSystem contains Managers (Strong ownership)
+BankingSystem *-- CustomerManager : contains
+BankingSystem *-- AccountManager : contains
+BankingSystem *-- TransactionProcessor : contains
+BankingSystem *-- AuthenticationManager : contains
+BankingSystem *-- InputValidator : contains
+
+' Aggregation: Managers share collections (Weak ownership)
+CustomerManager o-- Customer : manages
+AccountManager o-- Account : manages
+AuthenticationManager o-- User : manages
+AuthenticationManager o-- AuditLog : logs
+
+' Dependencies (Usage relationships)
+CustomerManager ..> InputValidator : uses
+CustomerManager ..> BankingSystem : logs to
+AccountManager ..> InputValidator : uses
+AccountManager ..> BankingSystem : logs to
+TransactionProcessor ..> InputValidator : uses
+TransactionProcessor ..> BankingSystem : logs to
+AuthenticationManager ..> InputValidator : uses
+
+' Utility usage dependencies
+CustomerManager ..> UIFormatter : uses
+AccountManager ..> UIFormatter : uses
+TransactionProcessor ..> UIFormatter : uses
+AuthenticationManager ..> UIFormatter : uses
+InputValidator ..> ValidationPatterns : uses
+AccountManager ..> AccountUtils : uses
+TransactionProcessor ..> AccountUtils : uses
+
+' Main creates BankingSystem
+Main ..> BankingSystem : creates
+
+' BankingSystem uses MenuAction
+BankingSystem --> MenuAction : routes
+
+' Notes for key design patterns
+note right of BankingSystem
+  <b>Facade Pattern</b>
+  Central controller that simplifies
+  access to complex subsystems
+  (managers, validators, auth)
+end note
+
+note top of User
+  <b>Inheritance & Polymorphism</b>
+  Abstract base class with
+  role-specific subclasses
+end note
+
+note top of Account
+  <b>Strategy Pattern</b>
+  withdraw() behavior varies:
+  - Savings: No overdraft
+  - Checking: Allows overdraft
+end note
+
+note left of Customer
+  <b>One-to-One Relationship</b>
+  Customer ↔ CustomerProfile
+  Bidirectional, optional
+end note
+
+note right of Customer
+  <b>One-to-Many Relationship</b>
+  Customer → Account
+  One customer owns many accounts
+end note
+
+note bottom of AuthenticationManager
+  <b>Stack-based Audit Trail</b>
+  LIFO order for most recent logs
+  Immutable AuditLog entries
+end note
+
+@enduml
