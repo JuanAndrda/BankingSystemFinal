@@ -82,6 +82,68 @@ Complete security implementation analysis:
 
 ---
 
+### 6. Menu System Documentation (7 Files)
+
+**Complete menu operation documentation with dual numbering system**
+
+#### [6-Menu-Overview.md](6-Menu-Overview.md) (~300 lines)
+- Menu architecture and design
+- Dual numbering system (Admin/Customer)
+- Complete menu reference tables
+- Access control summary
+
+#### [6.1-Login.md](6.1-Login.md) (~400 lines)
+- Login screen authentication flow
+- 3-attempt limit with security
+- Session management
+- Audit logging
+
+#### [6.2-Customer-Ops.md](6.2-Customer-Ops.md) (~1,523 lines)
+- **Admin #1:** Create Customer (auto-ID generation)
+- **Admin #2:** View Customer Details
+- **Admin #3:** View All Customers
+- **Admin #4:** Delete Customer (cascade delete)
+
+#### [6.3-Account-Ops.md](6.3-Account-Ops.md) (~1,375 lines)
+- **Admin #5:** Create Account (polymorphic - Savings/Checking)
+- **Admin #6 / Customer #1:** View Account Details (shared, access-controlled)
+- **Admin #7:** View All Accounts
+- **Admin #8:** Delete Account (with balance check)
+- **Admin #9:** Update Overdraft Limit (Checking only)
+
+#### [6.4-Transaction-Ops.md](6.4-Transaction-Ops.md) (~1,100 lines)
+- **Admin #10 / Customer #2:** Deposit Money
+- **Admin #11 / Customer #3:** Withdraw Money (polymorphic withdraw)
+- **Admin #12 / Customer #4:** Transfer Money (atomic operation)
+- **Admin #13 / Customer #5:** View Transaction History (Stack LIFO)
+
+#### [6.5-Profile-Reports.md](6.5-Profile-Reports.md) (~1,500 lines)
+- **Admin #14:** Create/Update Customer Profile (one-to-one relationship)
+- **Admin #15:** Update Profile Information
+- **Admin #16:** Apply Interest (All Savings Accounts - polymorphism)
+- **Admin #17:** Sort Accounts by Name (Insertion Sort ascending)
+- **Admin #18:** Sort Accounts by Balance (Insertion Sort descending)
+- **Admin #19:** View Audit Trail (Stack LIFO display)
+
+#### [6.6-Security-Session.md](6.6-Security-Session.md) (~700 lines)
+- **Admin #21 / Customer #6:** Change Password (Immutable User pattern)
+- **Admin #0 / Customer #0:** Logout (session management)
+- **Admin #20 / Customer #7:** Exit Application (graceful shutdown)
+
+📄 **Total: ~6,900 lines across 7 files** | Complete menu system documentation
+
+**Key Concepts Demonstrated:**
+- ✅ **Dual Numbering:** Same operation, different menu numbers (Admin/Customer)
+- ✅ **Access Control:** Role-based permissions, account ownership validation
+- ✅ **Polymorphism:** Savings vs Checking account behaviors
+- ✅ **Data Structures:** LinkedList operations, Stack LIFO display
+- ✅ **Algorithms:** Insertion Sort (ascending/descending)
+- ✅ **Relationships:** One-to-One (Customer ↔ Profile), One-to-Many (Customer → Accounts)
+- ✅ **Immutable Pattern:** User object replacement on password change
+- ✅ **Atomic Operations:** Transfer as single transaction
+
+---
+
 ## 📊 Total Documentation
 
 | File | Lines | Focus | Points Covered |
@@ -91,7 +153,16 @@ Complete security implementation analysis:
 | 3-Error-Handling.md | ~600 | Validation, error handling | 16 points (Both) |
 | 4-CRUD-Operations.md | ~1,100 | All CRUD operations | 20 points (Both) |
 | 5-Security-Features.md | ~750 | Security implementation | Comprehensive |
-| **TOTAL** | **~4,250** | **Complete coverage** | **96+ points** |
+| **Core Subtotal** | **~4,250** | **Core concepts** | **96+ points** |
+| **6-Menu-Overview.md** | ~300 | Menu architecture | Menu system |
+| **6.1-Login.md** | ~400 | Login flow | Authentication |
+| **6.2-Customer-Ops.md** | ~1,523 | Customer operations | Admin #1-4 |
+| **6.3-Account-Ops.md** | ~1,375 | Account operations | Admin #5-9, Cust #1 |
+| **6.4-Transaction-Ops.md** | ~1,100 | Transaction operations | Admin #10-13, Cust #2-5 |
+| **6.5-Profile-Reports.md** | ~1,500 | Profile & reports | Admin #14-19 |
+| **6.6-Security-Session.md** | ~700 | Security & session | Admin #21/#0/#20, Cust #6/#0/#7 |
+| **Menu Subtotal** | **~6,900** | **22 menu operations** | **Complete menu system** |
+| **GRAND TOTAL** | **~11,150** | **Complete system** | **All requirements** |
 
 ---
 
@@ -154,6 +225,8 @@ Complete security implementation analysis:
 2. **2-Data-Structures.md:** Understand data structure choices and sorting
 3. **4-CRUD-Operations.md:** Explain CRUD workflows
 4. **5-Security-Features.md:** Discuss security implementation and limitations
+5. **6-Menu-Overview.md:** Understand dual numbering and menu architecture
+6. **6.x Menu Files:** Review specific operations with code flow and examples
 
 ### For Code Review
 
@@ -173,7 +246,14 @@ BankingProjectPart3/
 │   ├── 2-Data-Structures.md       # Data structures & sorting (25 points)
 │   ├── 3-Error-Handling.md        # Error handling (16 points)
 │   ├── 4-CRUD-Operations.md       # CRUD operations (20 points)
-│   └── 5-Security-Features.md     # Security features
+│   ├── 5-Security-Features.md     # Security features
+│   ├── 6-Menu-Overview.md         # Menu architecture
+│   ├── 6.1-Login.md               # Login screen
+│   ├── 6.2-Customer-Ops.md        # Customer operations (Admin #1-4)
+│   ├── 6.3-Account-Ops.md         # Account operations (Admin #5-9, Cust #1)
+│   ├── 6.4-Transaction-Ops.md     # Transaction operations (Admin #10-13, Cust #2-5)
+│   ├── 6.5-Profile-Reports.md     # Profile & reports (Admin #14-19)
+│   └── 6.6-Security-Session.md    # Security & session (Admin #21/#0/#20, Cust #6/#0/#7)
 │
 ├── src/                            # Source code (26 Java files)
 │   └── com/banking/
@@ -219,9 +299,10 @@ BankingProjectPart3/
 
 - **Code Examples:** All include file paths (e.g., `src/com/banking/Main.java:42`)
 - **Format:** Professional Markdown with syntax highlighting
-- **Comprehensive:** ~4,250 lines of documentation
+- **Comprehensive:** ~11,150 lines of documentation (12 files)
 - **Ready for Submission:** Can be converted to PDF if needed
 - **Rubric-Aligned:** Clear point breakdowns for each requirement
+- **Menu System:** Complete documentation of all 22 menu operations
 
 ---
 
@@ -238,5 +319,6 @@ For questions about this documentation or the Banking System implementation, ple
 ---
 
 **Last Updated:** December 2025
-**Documentation Version:** 1.0
-**Total Pages:** ~4,250 lines across 5 files
+**Documentation Version:** 2.0
+**Total Pages:** ~11,150 lines across 12 files
+**Menu Documentation:** 7 files covering all 22 menu operations
