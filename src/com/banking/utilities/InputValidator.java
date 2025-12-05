@@ -50,22 +50,6 @@ public class InputValidator {
         return input;
     }
 
-    // Get double input with cancellation support
-    public Double getCancellableDouble(String prompt) {
-        System.out.print(prompt + " (or type 'back' to cancel): ");
-        String input = sc.nextLine().trim();
-        if (input.equalsIgnoreCase("back")) {
-            System.out.println("✗ Operation cancelled. Returning to menu...\n");
-            return null;
-        }
-        try {
-            return Double.parseDouble(input);
-        } catch (NumberFormatException e) {
-            System.out.println("✗ Invalid number format");
-            return null;
-        }
-    }
-
     // Get validated input matching pattern
     public String getValidatedInput(String prompt, String pattern, String formatHint) {
         while (true) {
@@ -91,21 +75,6 @@ public class InputValidator {
                 return input.trim();
             } else {
                 System.out.println("✗ This field cannot be empty!");
-                System.out.println("   Please try again...\n");
-            }
-        }
-    }
-
-    // Get validated positive amount
-    public Double getValidatedAmount(String prompt) {
-        while (true) {
-            Double amount = this.getCancellableDouble(prompt);
-            if (amount == null) return null;
-
-            if (amount > 0) {
-                return amount;
-            } else {
-                System.out.println("✗ Amount must be greater than zero!");
                 System.out.println("   Please try again...\n");
             }
         }

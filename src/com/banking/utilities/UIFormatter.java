@@ -252,18 +252,6 @@ public class UIFormatter {
     }
 
     /**
-     * Prints a horizontal separator line (70 characters).
-     *
-     * Example:
-     * <pre>
-     * ════════════════════════════════════════════════════════════════════
-     * </pre>
-     */
-    public static void printSeparator() {
-        System.out.println(String.valueOf(HORIZONTAL).repeat(BOX_WIDTH));
-    }
-
-    /**
      * Prints a blank line (for spacing between sections).
      */
     public static void printBlankLine() {
@@ -340,41 +328,6 @@ public class UIFormatter {
         );
     }
 
-    // ===== UTILITY METHODS FOR SPECIAL CASES =====
-
-    /**
-     * Prints a welcome banner for the application start.
-     */
-    public static void printWelcomeBanner() {
-        printBoxTitle("BANKING MANAGEMENT SYSTEM v2.0");
-        System.out.println();
-    }
-
-    /**
-     * Prints a goodbye message for application exit.
-     */
-    public static void printGoodbyeMessage() {
-        System.out.println();
-        printBoxTitle("Thank you for using our Banking System!");
-        System.out.println();
-    }
-
-    /**
-     * Prints a divider line with text (for menu sections).
-     *
-     * Example:
-     * <pre>
-     * ─────────────── CUSTOMER OPERATIONS ───────────────
-     * </pre>
-     *
-     * @param text The divider text
-     */
-    public static void printDivider(String text) {
-        int dashCount = (BOX_WIDTH - text.length() - 2) / 2;
-        String dashes = "─".repeat(dashCount);
-        System.out.println(dashes + " " + text + " " + dashes);
-    }
-
     // ===== ENHANCED UI METHODS (Phase 2 Improvements) =====
 
     /**
@@ -439,50 +392,6 @@ public class UIFormatter {
 
         printBottomBorder();
         System.out.println();
-    }
-
-    /**
-     * Prints a breadcrumb trail for navigation context.
-     * Shows the user's current location in the menu hierarchy.
-     *
-     * Example:
-     * <pre>
-     * → Main Menu > Customer Operations > Create Customer
-     * </pre>
-     *
-     * @param breadcrumbs Variable number of breadcrumb strings
-     */
-    public static void printBreadcrumb(String... breadcrumbs) {
-        if (breadcrumbs == null || breadcrumbs.length == 0) {
-            return;
-        }
-
-        System.out.print("\n" + INFO + " ");
-        for (int i = 0; i < breadcrumbs.length; i++) {
-            System.out.print(breadcrumbs[i]);
-            if (i < breadcrumbs.length - 1) {
-                System.out.print(" > ");
-            }
-        }
-        System.out.println("\n");
-    }
-
-    /**
-     * Prints an operation header with better formatting.
-     * Used at the start of each operation for visual consistency.
-     *
-     * Example:
-     * <pre>
-     * ╔══════════════════════════════════════════════════════════════════╗
-     * ║  CREATE CUSTOMER                                                 ║
-     * ╚══════════════════════════════════════════════════════════════════╝
-     *
-     * </pre>
-     *
-     * @param operation The operation name
-     */
-    public static void printOperationHeader(String operation) {
-        printSectionHeader(operation);
     }
 
     /**

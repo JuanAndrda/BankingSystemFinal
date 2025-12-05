@@ -2,9 +2,6 @@ package com.banking.managers;
 
 import com.banking.models.*;
 import com.banking.utilities.*;
-import com.banking.auth.User;
-import com.banking.auth.UserRole;
-import com.banking.auth.UserAccount;
 import com.banking.BankingSystem;
 import java.util.*;
 
@@ -209,14 +206,6 @@ public class AccountManager {
     public void sortAccountsByName() {
         this.insertionSortByName(this.accountList);
         UIFormatter.printSuccess("Accounts sorted by customer name");
-    }
-
-    public void displayAccountsBeforeSort() {
-        this.displayAccounts("BEFORE SORTING");
-    }
-
-    public void displayAccountsAfterSort() {
-        this.displayAccounts("AFTER SORTING");
     }
 
     private void insertionSortByBalance(LinkedList<Account> accountList) {
