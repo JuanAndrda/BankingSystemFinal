@@ -1,6 +1,9 @@
 package com.banking.utilities;
 
 import com.banking.models.*;
+import com.banking.auth.User;
+import com.banking.auth.UserAccount;
+import com.banking.auth.UserRole;
 import java.util.*;
 
 // Input validation utility class
@@ -227,7 +230,7 @@ public class InputValidator {
     }
 
     // Get validated account with access control
-    public Account getValidatedAccountWithAccessControl(com.banking.auth.User currentUser) {
+    public Account getValidatedAccountWithAccessControl(User currentUser) {
         // Check if user is null (no one logged in)
         if (currentUser == null) {
             System.out.println("✗ No user logged in");
@@ -235,18 +238,18 @@ public class InputValidator {
         }
 
         // If user is admin, allow any account input
-        if (currentUser.getUserRole() == com.banking.auth.UserRole.ADMIN) {
+        if (currentUser.getUserRole() == UserRole.ADMIN) {
             return this.getValidatedAccount("✗ Account not found");
         }
 
         // For customers: show their linked customer's accounts and let them choose
-        if (currentUser instanceof com.banking.auth.UserAccount) {
-            com.banking.auth.UserAccount customerAccount = (com.banking.auth.UserAccount) currentUser;
+        if (currentUser instanceof UserAccount) {
+            UserAccount customerAccount = (UserAccount) currentUser;
             String linkedCustomerId = customerAccount.getLinkedCustomerId();
 
             // Find all accounts owned by this customer
-            java.util.LinkedList<com.banking.models.Account> customerAccounts = new java.util.LinkedList<>();
-            for (com.banking.models.Account acc : this.accountList) {
+            LinkedList<Account> customerAccounts = new LinkedList<>();
+            for (Account acc : this.accountList) {
                 if (acc.getOwner() != null && acc.getOwner().getCustomerId().equals(linkedCustomerId)) {
                     customerAccounts.add(acc);
                 }

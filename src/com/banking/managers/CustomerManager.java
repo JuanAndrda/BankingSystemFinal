@@ -3,6 +3,8 @@ package com.banking.managers;
 import com.banking.models.*;
 import com.banking.utilities.*;
 import com.banking.BankingSystem;
+import com.banking.auth.UserAccount;
+import com.banking.managers.AuthenticationManager;
 import java.util.*;
 
 public class CustomerManager {
@@ -194,7 +196,7 @@ public class CustomerManager {
     }
 
     public void handleCreateCustomerProfile() {
-        UIFormatter.printSectionHeader("CREATE/UPDATE CUSTOMER PROFILE");
+        UIFormatter.printSectionHeader("CREATE CUSTOMER PROFILE");
         String custId = this.validator.getValidatedInput("Customer ID (to link profile to):",
                 com.banking.utilities.ValidationPatterns.CUSTOMER_ID_PATTERN,
                 "(format: " + com.banking.utilities.ValidationPatterns.CUSTOMER_ID_FORMAT + " e.g., C001)");
@@ -324,7 +326,7 @@ public class CustomerManager {
 
         // Step 4: Get AuthenticationManager for username/password generation
         // Calls BankingSystem.getAuthenticationManager()
-        com.banking.managers.AuthenticationManager authManager = this.bankingSystem.getAuthenticationManager();
+        AuthenticationManager authManager = this.bankingSystem.getAuthenticationManager();
         if (authManager == null) {
             UIFormatter.printError("Authentication system not available");
             return;
@@ -338,7 +340,7 @@ public class CustomerManager {
 
         // Step 6: Create UserAccount (linked to this customer)
         // Calls BankingSystem.registerUser() to add to user registry
-        com.banking.auth.UserAccount userAccount = new com.banking.auth.UserAccount(username, tempPassword, custId);
+        UserAccount userAccount = new UserAccount(username, tempPassword, custId);
         if (!this.bankingSystem.registerUser(userAccount)) {
             UIFormatter.printError("Failed to create login account for customer");
             return;
