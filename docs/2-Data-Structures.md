@@ -233,7 +233,7 @@ public void handleViewAllCustomers() {
     }
 
     System.out.println("\n=== ALL CUSTOMERS ===");
-    UIFormatter.printTableHeader("ID", "Name", "Date Created", "Profile");
+    UIFormatter.printTableHeader("ID", "Name", "Profile");
 
     // Iterate through LinkedList
     for (Customer customer : customers) {
@@ -241,7 +241,6 @@ public void handleViewAllCustomers() {
         UIFormatter.printTableRow(
             customer.getCustomerId(),
             customer.getName(),
-            customer.getDateCreated().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
             profileStatus
         );
     }
@@ -314,7 +313,7 @@ public LinkedList<Account> getAccountsForCustomer(String customerId) {
 
     // Iterate through all accounts - O(n)
     for (Account account : accounts) {
-        if (account.getOwnerId().equals(customerId)) {
+        if (account.getOwner().getCustomerId().equals(customerId)) {
             customerAccounts.add(account);  // Collect matching accounts
         }
     }
@@ -366,11 +365,10 @@ public void handleViewAllAccounts() {
 public abstract class Account {
     private String accountNo;
     private double balance;
-    private String ownerId;
-    private LocalDateTime dateOpened;
+    private Customer owner;  // Reference to owner Customer object
     private LinkedList<Transaction> transactions;  // Transaction history
 
-    public Account(String accountNo, String ownerId, double initialBalance) {
+    public Account(String accountNo, Customer owner, double initialBalance) {
         // ...
         this.transactions = new LinkedList<>();
     }
@@ -791,11 +789,11 @@ public void handleSortAccountsByName() {
         Account key = accountArray[i];
 
         // Get customer name for comparison
-        String keyCustomerName = getCustomerName(key.getOwnerId());
+        String keyCustomerName = key.getOwner().getName();
         int j = i - 1;
 
         // Shift elements greater than key to the right
-        while (j >= 0 && getCustomerName(accountArray[j].getOwnerId())
+        while (j >= 0 && accountArray[j].getOwner().getName()
                          .compareToIgnoreCase(keyCustomerName) > 0) {
             accountArray[j + 1] = accountArray[j];
             j--;

@@ -149,8 +149,8 @@ public void logout() {
 
 ```java
 @Override
-public List<String> getPermissions() {
-    List<String> permissions = new ArrayList<>();
+public LinkedList<String> getPermissions() {
+    LinkedList<String> permissions = new LinkedList<>();
 
     // Customer Management
     permissions.add("CREATE_CUSTOMER");
@@ -195,8 +195,8 @@ public List<String> getPermissions() {
 
 ```java
 @Override
-public List<String> getPermissions() {
-    List<String> permissions = new ArrayList<>();
+public LinkedList<String> getPermissions() {
+    LinkedList<String> permissions = new LinkedList<>();
 
     // Limited access - own accounts only
     permissions.add("VIEW_OWN_ACCOUNTS");
@@ -273,7 +273,7 @@ public boolean canAccessAccount(String accountNo) {
         // Find account and check ownership
         for (Account account : accountManager.getAccounts()) {
             if (account.getAccountNo().equals(accountNo)) {
-                return account.getOwnerId().equals(customerId);
+                return account.getOwner().getCustomerId().equals(customerId);
             }
         }
     }

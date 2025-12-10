@@ -214,10 +214,10 @@ public void handleCreateAccount() {
     // Step 5: Create account (polymorphic)
     Account account;
     if (choice == 1) {
-        account = new SavingsAccount(accountNo, customer.getCustomerId(), initialDeposit);
+        account = new SavingsAccount(accountNo, customer, initialDeposit);
         System.out.println("✓ Savings account created");
     } else {
-        account = new CheckingAccount(accountNo, customer.getCustomerId(), initialDeposit);
+        account = new CheckingAccount(accountNo, customer, initialDeposit);
         System.out.println("✓ Checking account created");
     }
 
@@ -495,7 +495,6 @@ public void handleViewAllCustomers() {
         UIFormatter.printTableRow(
             customer.getCustomerId(),
             customer.getName(),
-            customer.getDateCreated().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
             profileStatus,
             String.valueOf(accountCount)
         );
@@ -538,7 +537,6 @@ public void handleViewCustomerDetails() {
     System.out.println("\n=== CUSTOMER INFORMATION ===");
     System.out.println("Customer ID: " + customer.getCustomerId());
     System.out.println("Name: " + customer.getName());
-    System.out.println("Date Created: " + customer.getDateCreated());
 
     // 1-to-1: Profile
     if (customer.hasProfile()) {

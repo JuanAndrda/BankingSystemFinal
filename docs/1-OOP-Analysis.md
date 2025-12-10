@@ -90,7 +90,6 @@ public class Customer {
     // Private fields - encapsulated data
     private String customerId;
     private String name;
-    private LocalDateTime dateCreated;
     private CustomerProfile profile;  // 1-to-1 relationship
 
     // Public getter - controlled read access
@@ -123,9 +122,9 @@ public class Customer {
 ```
 
 **Benefits:**
-- ✓ **Data hiding:** customerId, name, dateCreated cannot be accessed directly
+- ✓ **Data hiding:** customerId, name cannot be accessed directly
 - ✓ **Validation:** setName() ensures name is never null or empty
-- ✓ **Immutability:** customerId and dateCreated have no setters
+- ✓ **Immutability:** customerId has no setter (read-only after creation)
 - ✓ **Flexibility:** Internal implementation can change without affecting external code
 
 ### 2. Account Class Encapsulation
@@ -137,8 +136,7 @@ public abstract class Account {
     // Private fields - encapsulated data
     private String accountNo;
     private double balance;
-    private String ownerId;
-    private LocalDateTime dateOpened;
+    private Customer owner;  // Reference to owner Customer object
     private LinkedList<Transaction> transactions;
 
     // Public getter - read-only access
@@ -195,11 +193,11 @@ public abstract class User {
     private boolean passwordChangeRequired;
 
     // Constructor - controlled initialization
-    public User(String username, String password, UserRole userRole) {
+    public User(String username, String password, UserRole userRole, boolean passwordChangeRequired) {
         this.username = validateUsername(username);
         this.password = validatePassword(password);
         this.userRole = validateUserRole(userRole);
-        this.passwordChangeRequired = false;
+        this.passwordChangeRequired = passwordChangeRequired;
     }
 
     // Private validation methods - encapsulated logic
@@ -321,11 +319,11 @@ public abstract class User {
     private final UserRole userRole;
     private boolean passwordChangeRequired;
 
-    public User(String username, String password, UserRole userRole) {
+    public User(String username, String password, UserRole userRole, boolean passwordChangeRequired) {
         this.username = validateUsername(username);
         this.password = validatePassword(password);
         this.userRole = validateUserRole(userRole);
-        this.passwordChangeRequired = false;
+        this.passwordChangeRequired = passwordChangeRequired;
     }
 
     // Common methods inherited by all subclasses
@@ -350,7 +348,7 @@ public abstract class User {
     }
 
     // Abstract method - must be implemented by subclasses
-    public abstract List<String> getPermissions();
+    public abstract LinkedList<String> getPermissions();
 
     // Template method - uses abstract method
     public boolean hasPermission(String permission) {
@@ -369,13 +367,13 @@ public class Admin extends User {
     // Inherits: getUsername(), getUserRole(), authenticate(), etc.
 
     public Admin(String username, String password) {
-        super(username, password, UserRole.ADMIN);  // Call parent constructor
+        super(username, password, UserRole.ADMIN, false);  // Call parent constructor
     }
 
     // Override abstract method - provide Admin-specific implementation
     @Override
-    public List<String> getPermissions() {
-        List<String> permissions = new ArrayList<>();
+    public LinkedList<String> getPermissions() {
+        LinkedList<String> permissions = new LinkedList<>();
 
         // Admin has FULL system access (21 permissions)
         permissions.add("CREATE_CUSTOMER");
@@ -418,7 +416,7 @@ public class UserAccount extends User {
     // Inherits: getUsername(), getUserRole(), authenticate(), etc.
 
     public UserAccount(String username, String password, String linkedCustomerId) {
-        super(username, password, UserRole.CUSTOMER);  // Call parent constructor
+        super(username, password, UserRole.CUSTOMER, false);  // Call parent constructor
         this.linkedCustomerId = validateCustomerId(linkedCustomerId);
     }
 
@@ -436,8 +434,8 @@ public class UserAccount extends User {
 
     // Override abstract method - provide Customer-specific implementation
     @Override
-    public List<String> getPermissions() {
-        List<String> permissions = new ArrayList<>();
+    public LinkedList<String> getPermissions() {
+        LinkedList<String> permissions = new LinkedList<>();
 
         // Customer has LIMITED access (7 permissions)
         permissions.add("VIEW_OWN_ACCOUNTS");
@@ -475,15 +473,13 @@ public class UserAccount extends User {
 public abstract class Account {
     private String accountNo;
     private double balance;
-    private String ownerId;
-    private LocalDateTime dateOpened;
+    private Customer owner;  // Reference to owner Customer object
     private LinkedList<Transaction> transactions;
 
-    public Account(String accountNo, String ownerId, double initialBalance) {
+    public Account(String accountNo, Customer owner, double initialBalance) {
         this.accountNo = validateAccountNo(accountNo);
-        this.ownerId = validateOwnerId(ownerId);
+        this.owner = validateOwner(owner);
         this.balance = initialBalance;
-        this.dateOpened = LocalDateTime.now();
         this.transactions = new LinkedList<>();
     }
 
@@ -496,13 +492,10 @@ public abstract class Account {
         return this.balance;
     }
 
-    public String getOwnerId() {
-        return this.ownerId;
+    public Customer getOwner() {
+        return this.owner;
     }
 
-    public LocalDateTime getDateOpened() {
-        return this.dateOpened;
-    }
 
     public LinkedList<Transaction> getTransactions() {
         return this.transactions;
@@ -545,11 +538,11 @@ public class SavingsAccount extends Account {
     // Additional field specific to SavingsAccount
     private static final double INTEREST_RATE = 0.03;  // 3% interest
 
-    // Inherits: accountNo, balance, ownerId, dateOpened, transactions
+    // Inherits: accountNo, balance, owner, transactions
     // Inherits: deposit(), getAccountNo(), getBalance(), etc.
 
-    public SavingsAccount(String accountNo, String ownerId, double initialBalance) {
-        super(accountNo, ownerId, initialBalance);  // Call parent constructor
+    public SavingsAccount(String accountNo, Customer owner, double initialBalance) {
+        super(accountNo, owner, initialBalance);  // Call parent constructor
     }
 
     // Additional method specific to SavingsAccount
@@ -584,7 +577,7 @@ public class SavingsAccount extends Account {
     @Override
     public String getDetails() {
         return String.format("Account: %s | Type: SAVINGS | Balance: $%.2f | Interest Rate: %.1f%% | Owner: %s",
-                           getAccountNo(), getBalance(), INTEREST_RATE * 100, getOwnerId());
+                           getAccountNo(), getBalance(), INTEREST_RATE * 100, getOwner().getName());
     }
 }
 ```
@@ -598,11 +591,11 @@ public class CheckingAccount extends Account {
     // Additional field specific to CheckingAccount
     private double overdraftLimit;
 
-    // Inherits: accountNo, balance, ownerId, dateOpened, transactions
+    // Inherits: accountNo, balance, owner, transactions
     // Inherits: deposit(), getAccountNo(), getBalance(), etc.
 
-    public CheckingAccount(String accountNo, String ownerId, double initialBalance) {
-        super(accountNo, ownerId, initialBalance);  // Call parent constructor
+    public CheckingAccount(String accountNo, Customer owner, double initialBalance) {
+        super(accountNo, owner, initialBalance);  // Call parent constructor
         this.overdraftLimit = 500.0;  // Default overdraft limit
     }
 
@@ -642,7 +635,7 @@ public class CheckingAccount extends Account {
     @Override
     public String getDetails() {
         return String.format("Account: %s | Type: CHECKING | Balance: $%.2f | Overdraft Limit: $%.2f | Owner: %s",
-                           getAccountNo(), getBalance(), overdraftLimit, getOwnerId());
+                           getAccountNo(), getBalance(), overdraftLimit, getOwner().getName());
     }
 }
 ```
@@ -727,8 +720,7 @@ public abstract class Account {
     // Concrete fields - all accounts have these
     private String accountNo;
     private double balance;
-    private String ownerId;
-    private LocalDateTime dateOpened;
+    private Customer owner;  // Reference to owner Customer object
     private LinkedList<Transaction> transactions;
 
     // Concrete method - shared by all accounts
@@ -1033,7 +1025,7 @@ If account instanceof CheckingAccount:
 @Override
 public String getDetails() {
     return String.format("Account: %s | Type: SAVINGS | Balance: $%.2f | Interest Rate: %.1f%% | Owner: %s",
-                       getAccountNo(), getBalance(), INTEREST_RATE * 100, getOwnerId());
+                       getAccountNo(), getBalance(), INTEREST_RATE * 100, getOwner().getName());
 }
 ```
 
@@ -1042,7 +1034,7 @@ public String getDetails() {
 @Override
 public String getDetails() {
     return String.format("Account: %s | Type: CHECKING | Balance: $%.2f | Overdraft Limit: $%.2f | Owner: %s",
-                       getAccountNo(), getBalance(), overdraftLimit, getOwnerId());
+                       getAccountNo(), getBalance(), overdraftLimit, getOwner().getName());
 }
 ```
 
@@ -1285,7 +1277,6 @@ Each Customer can have exactly **one** CustomerProfile, and each CustomerProfile
 public class Customer {
     private String customerId;
     private String name;
-    private LocalDateTime dateCreated;
     private CustomerProfile profile;  // One-to-One reference
 
     public CustomerProfile getProfile() {
@@ -1379,11 +1370,11 @@ Each Customer can have **multiple** Accounts, but each Account belongs to exactl
 public abstract class Account {
     private String accountNo;
     private double balance;
-    private String ownerId;  // Foreign key - references Customer.customerId
+    private Customer owner;  // Reference to owner Customer object
     // ...
 
-    public String getOwnerId() {
-        return this.ownerId;
+    public Customer getOwner() {
+        return this.owner;
     }
 }
 ```
@@ -1398,7 +1389,7 @@ public LinkedList<Account> getAccountsForCustomer(String customerId) {
 
     // Iterate through all accounts
     for (Account account : accounts) {
-        if (account.getOwnerId().equals(customerId)) {
+        if (account.getOwner().getCustomerId().equals(customerId)) {
             customerAccounts.add(account);  // Collect customer's accounts
         }
     }

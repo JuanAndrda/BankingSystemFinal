@@ -458,7 +458,7 @@ public Account getValidatedAccountWithAccessControl(User currentUser) {
         String customerId = userAccount.getLinkedCustomerId();
 
         for (Account account : accounts) {
-            if (account.getOwnerId().equals(customerId)) {
+            if (account.getOwner().getCustomerId().equals(customerId)) {
                 accessibleAccounts.add(account);
             }
         }
