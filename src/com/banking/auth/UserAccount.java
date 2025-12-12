@@ -36,19 +36,14 @@ public class UserAccount extends User {
         permissions.add("VIEW_ACCOUNT_DETAILS");
 
         // Transaction operations (own accounts only)
-        permissions.add("DEPOSIT");
-        permissions.add("WITHDRAW");
-        permissions.add("TRANSFER");
+        permissions.add("DEPOSIT_MONEY");
+        permissions.add("WITHDRAW_MONEY");
+        permissions.add("TRANSFER_MONEY");
         permissions.add("VIEW_TRANSACTION_HISTORY");
 
         // Security operations
         permissions.add("CHANGE_PASSWORD");
 
         return permissions;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("UserAccount[Username=%s, LinkedCustomer=%s]", getUsername(), linkedCustomerId);
     }
 }

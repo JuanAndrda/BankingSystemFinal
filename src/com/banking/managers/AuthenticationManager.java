@@ -5,6 +5,7 @@ import com.banking.auth.Admin;
 import com.banking.auth.UserAccount;
 import com.banking.auth.UserRole;
 import com.banking.auth.AuditLog;
+import com.banking.utilities.InputValidator;
 import java.util.LinkedList;
 import java.util.Stack;
 import java.util.Scanner;
@@ -15,12 +16,14 @@ public class AuthenticationManager {
     private Stack<AuditLog> auditTrail;  // All system operations logged (LIFO - most recent first)
     private User currentUser;  // Currently logged-in user
     private int loginAttempts;  // Track failed login attempts
+    private InputValidator validator;  // Input validation and cancellable prompts
 
-    public AuthenticationManager() {
+    public AuthenticationManager(InputValidator validator) {
         this.userRegistry = new LinkedList<>();
         this.auditTrail = new Stack<>();
         this.currentUser = null;
         this.loginAttempts = 0;
+        this.validator = validator;
     }
 
 
@@ -223,12 +226,14 @@ public class AuthenticationManager {
             if (currentUser instanceof Admin) {
                 // Create new Admin with new password
                 newUser = new Admin(username, newPassword);
+                newUser.setPasswordChangeRequired(false);  // Password has been changed
             } else if (currentUser instanceof UserAccount) {
                 // Create new UserAccount with new password, preserving linked customer ID
                 UserAccount userAccount = (UserAccount) currentUser;
                 newUser = new UserAccount(username, newPassword, userAccount.getLinkedCustomerId());
-                // Preserve the passwordChangeRequired flag from the current user
-                newUser.setPasswordChangeRequired(currentUser.isPasswordChangeRequired());
+                newUser.setPasswordChangeRequired(false);  // Password has been changed
+
+
             } else {
                 System.out.println("✗ Unknown user type");
                 return null;
@@ -250,6 +255,63 @@ public class AuthenticationManager {
         logAction(username, currentUser.getUserRole(), "CHANGE_PASSWORD", "User successfully changed their password");
 
         return newUser;  // Return new User object for caller to use as currentUser
+    }
+
+    /**
+     * Handler: Change password for current user.
+     * Customers must change their auto-generated password on first login.
+     * Uses changePassword() to create new User object (immutable pattern).
+     *
+     * Method calls:
+     * - Calls getCurrentUser() to get current user
+     * - Calls InputValidator.getCancellableInput() for password prompts (twice)
+     * - Calls changePassword() to create new User object
+     * - Updates user in userRegistry
+     *
+     * @return Updated User object if password change successful, null otherwise
+     */
+    public User handleChangePassword() {
+        System.out.println("\n--- CHANGE PASSWORD ---");
+
+        // Get current user
+        if (this.currentUser == null) {
+            System.out.println("✗ No user logged in");
+            return null;
+        }
+
+        String username = this.currentUser.getUsername();
+
+        while (true) {  // OUTER RETRY LOOP
+            // Step 1: Prompt for current password
+            String oldPassword = this.validator.getCancellableInput("Enter current password");
+            if (oldPassword == null) return null;  // User cancelled - exit immediately
+
+            // Step 2: Prompt for new password
+            String newPassword = this.validator.getCancellableInput("Enter new password");
+            if (newPassword == null) return null;  // User cancelled - exit immediately
+
+            // Step 3: Call changePassword() to validate and create new User object
+            User newUser = this.changePassword(username, oldPassword, newPassword);
+
+            if (newUser == null) {
+                System.out.println("✗ Password change failed.");
+
+                if (!this.validator.confirmAction("Try again?")) {
+                    return null;  // User chose no - exit
+                }
+                // User chose yes - retry from top
+            } else {
+                // Step 4: Update currentUser reference to new User object
+                this.currentUser = newUser;
+
+                // Step 5: Success message
+                System.out.println("\n✓ Password changed successfully!");
+                System.out.println("  • You are still logged in with your new password");
+                System.out.println("  • New password will be used for all future logins\n");
+
+                return newUser;  // Return new User object for caller to update their reference
+            }
+        }
     }
 
     public void displayAuditTrail() {

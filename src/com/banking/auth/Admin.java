@@ -19,7 +19,7 @@ public class Admin extends User {
 
         // Customer operations
         permissions.add("CREATE_CUSTOMER");
-        permissions.add("VIEW_CUSTOMER");
+        permissions.add("VIEW_CUSTOMER_DETAILS");
         permissions.add("VIEW_ALL_CUSTOMERS");
         permissions.add("DELETE_CUSTOMER");
 
@@ -28,26 +28,22 @@ public class Admin extends User {
         permissions.add("VIEW_ACCOUNT_DETAILS");
         permissions.add("VIEW_ALL_ACCOUNTS");
         permissions.add("DELETE_ACCOUNT");
-        permissions.add("UPDATE_OVERDRAFT");
+        permissions.add("UPDATE_OVERDRAFT_LIMIT");
 
         // Profile operations
-        permissions.add("CREATE_PROFILE");
-        permissions.add("UPDATE_PROFILE");
+        permissions.add("CREATE_CUSTOMER_PROFILE");
+        permissions.add("UPDATE_PROFILE_INFORMATION");
 
         // Transaction operations (viewing/managing)
         permissions.add("VIEW_TRANSACTION_HISTORY");
 
         // Reporting & utilities
         permissions.add("APPLY_INTEREST");
-        permissions.add("SORT_BY_NAME");
-        permissions.add("SORT_BY_BALANCE");
+        permissions.add("SORT_ACCOUNTS_BY_NAME");
+        permissions.add("SORT_ACCOUNTS_BY_BALANCE");
         permissions.add("VIEW_AUDIT_TRAIL");
+        permissions.add("CHANGE_PASSWORD");
 
         return permissions;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("Admin[Username=%s]", getUsername());
     }
 }

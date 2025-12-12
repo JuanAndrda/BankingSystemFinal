@@ -104,7 +104,7 @@ public class BankingSystem {
         this.txProcessor.setBankingSystem(this);
 
         // Initialize authentication manager (no circular dependency)
-        this.authManager = new AuthenticationManager();
+        this.authManager = new AuthenticationManager(this.validator);
         this.currentUser = null;
     }
 
@@ -183,81 +183,176 @@ public class BankingSystem {
                 switch (action) {
                     // ===== CUSTOMER OPERATIONS (Admin Only) =====
                     case CREATE_CUSTOMER:
-                        this.customerMgr.handleCreateCustomer();
+                        if (this.hasPermission("CREATE_CUSTOMER")) {
+                            this.customerMgr.handleCreateCustomer();
+                        } else {
+                            System.out.println("✗ You do not have permission to create customers.");
+                            this.logAction("CREATE_CUSTOMER_DENIED", "User attempted to create customer without permission");
+                        }
                         break;
 
                     case VIEW_CUSTOMER_DETAILS:
-                        this.customerMgr.handleViewCustomerDetails();
+                        if (this.hasPermission("VIEW_CUSTOMER_DETAILS")) {
+                            this.customerMgr.handleViewCustomerDetails();
+                        } else {
+                            System.out.println("✗ You do not have permission to view customer details.");
+                            this.logAction("VIEW_CUSTOMER_DETAILS_DENIED", "User attempted to view customer details without permission");
+                        }
                         break;
 
                     case VIEW_ALL_CUSTOMERS:
-                        this.customerMgr.handleViewAllCustomers();
+                        if (this.hasPermission("VIEW_ALL_CUSTOMERS")) {
+                            this.customerMgr.handleViewAllCustomers();
+                        } else {
+                            System.out.println("✗ You do not have permission to view all customers.");
+                            this.logAction("VIEW_ALL_CUSTOMERS_DENIED", "User attempted to view all customers without permission");
+                        }
                         break;
 
                     case DELETE_CUSTOMER:
-                        this.customerMgr.handleDeleteCustomer();
+                        if (this.hasPermission("DELETE_CUSTOMER")) {
+                            this.customerMgr.handleDeleteCustomer();
+                        } else {
+                            System.out.println("✗ You do not have permission to delete customers.");
+                            this.logAction("DELETE_CUSTOMER_DENIED", "User attempted to delete customer without permission");
+                        }
                         break;
 
                     // ===== ACCOUNT OPERATIONS =====
                     case CREATE_ACCOUNT:
-                        this.accountMgr.handleCreateAccount();
+                        if (this.hasPermission("CREATE_ACCOUNT")) {
+                            this.accountMgr.handleCreateAccount();
+                        } else {
+                            System.out.println("✗ You do not have permission to create accounts.");
+                            this.logAction("CREATE_ACCOUNT_DENIED", "User attempted to create account without permission");
+                        }
                         break;
 
                     case VIEW_ACCOUNT_DETAILS:
-                        // Access control enforced inside handler via canAccessAccount()
-                        this.accountMgr.handleViewAccountDetails();
+                        // Layer 3a: Permission check (role-based)
+                        if (this.hasPermission("VIEW_ACCOUNT_DETAILS")) {
+                            // Layer 3b: Account access control enforced inside handler via canAccessAccount()
+                            this.accountMgr.handleViewAccountDetails();
+                        } else {
+                            System.out.println("✗ You do not have permission to view account details.");
+                            this.logAction("VIEW_ACCOUNT_DETAILS_DENIED", "User attempted to view account details without permission");
+                        }
                         break;
 
                     case VIEW_ALL_ACCOUNTS:
-                        this.accountMgr.handleViewAllAccounts();
+                        if (this.hasPermission("VIEW_ALL_ACCOUNTS")) {
+                            this.accountMgr.handleViewAllAccounts();
+                        } else {
+                            System.out.println("✗ You do not have permission to view all accounts.");
+                            this.logAction("VIEW_ALL_ACCOUNTS_DENIED", "User attempted to view all accounts without permission");
+                        }
                         break;
 
                     case DELETE_ACCOUNT:
-                        this.accountMgr.handleDeleteAccount();
+                        if (this.hasPermission("DELETE_ACCOUNT")) {
+                            this.accountMgr.handleDeleteAccount();
+                        } else {
+                            System.out.println("✗ You do not have permission to delete accounts.");
+                            this.logAction("DELETE_ACCOUNT_DENIED", "User attempted to delete account without permission");
+                        }
                         break;
 
                     case UPDATE_OVERDRAFT_LIMIT:
-                        this.accountMgr.handleUpdateOverdraftLimit();
+                        if (this.hasPermission("UPDATE_OVERDRAFT_LIMIT")) {
+                            this.accountMgr.handleUpdateOverdraftLimit();
+                        } else {
+                            System.out.println("✗ You do not have permission to update overdraft limits.");
+                            this.logAction("UPDATE_OVERDRAFT_LIMIT_DENIED", "User attempted to update overdraft limit without permission");
+                        }
                         break;
 
                     // ===== TRANSACTION OPERATIONS (Both Roles) =====
-                    // Account-level access control enforced inside handlers via canAccessAccount()
+                    // Dual security: Permission check + account-level access control inside handlers
                     case DEPOSIT_MONEY:
-                        this.txProcessor.handleDeposit();
+                        if (this.hasPermission("DEPOSIT_MONEY")) {
+                            // Account access control enforced inside handler via canAccessAccount()
+                            this.txProcessor.handleDeposit();
+                        } else {
+                            System.out.println("✗ You do not have permission to deposit money.");
+                            this.logAction("DEPOSIT_MONEY_DENIED", "User attempted to deposit without permission");
+                        }
                         break;
 
                     case WITHDRAW_MONEY:
-                        this.txProcessor.handleWithdraw();
+                        if (this.hasPermission("WITHDRAW_MONEY")) {
+                            // Account access control enforced inside handler via canAccessAccount()
+                            this.txProcessor.handleWithdraw();
+                        } else {
+                            System.out.println("✗ You do not have permission to withdraw money.");
+                            this.logAction("WITHDRAW_MONEY_DENIED", "User attempted to withdraw without permission");
+                        }
                         break;
 
                     case TRANSFER_MONEY:
-                        this.txProcessor.handleTransfer();
+                        if (this.hasPermission("TRANSFER_MONEY")) {
+                            // Account access control enforced inside handler via canAccessAccount()
+                            this.txProcessor.handleTransfer();
+                        } else {
+                            System.out.println("✗ You do not have permission to transfer money.");
+                            this.logAction("TRANSFER_MONEY_DENIED", "User attempted to transfer without permission");
+                        }
                         break;
 
                     case VIEW_TRANSACTION_HISTORY:
-                        this.txProcessor.handleViewTransactionHistory();
+                        if (this.hasPermission("VIEW_TRANSACTION_HISTORY")) {
+                            // Account access control enforced inside handler via canAccessAccount()
+                            this.txProcessor.handleViewTransactionHistory();
+                        } else {
+                            System.out.println("✗ You do not have permission to view transaction history.");
+                            this.logAction("VIEW_TRANSACTION_HISTORY_DENIED", "User attempted to view transaction history without permission");
+                        }
                         break;
 
                     // ===== PROFILE OPERATIONS (Admin Only) =====
                     case CREATE_CUSTOMER_PROFILE:
-                        this.customerMgr.handleCreateCustomerProfile();
+                        if (this.hasPermission("CREATE_CUSTOMER_PROFILE")) {
+                            this.customerMgr.handleCreateCustomerProfile();
+                        } else {
+                            System.out.println("✗ You do not have permission to create customer profiles.");
+                            this.logAction("CREATE_CUSTOMER_PROFILE_DENIED", "User attempted to create customer profile without permission");
+                        }
                         break;
 
                     case UPDATE_PROFILE_INFORMATION:
-                        this.customerMgr.handleUpdateCustomerProfile();
+                        if (this.hasPermission("UPDATE_PROFILE_INFORMATION")) {
+                            this.customerMgr.handleUpdateCustomerProfile();
+                        } else {
+                            System.out.println("✗ You do not have permission to update profile information.");
+                            this.logAction("UPDATE_PROFILE_INFORMATION_DENIED", "User attempted to update profile without permission");
+                        }
                         break;
 
                     // ===== REPORTS & UTILITIES (Admin Only) =====
                     case APPLY_INTEREST:
-                        this.accountMgr.handleApplyInterest();
+                        if (this.hasPermission("APPLY_INTEREST")) {
+                            this.accountMgr.handleApplyInterest();
+                        } else {
+                            System.out.println("✗ You do not have permission to apply interest.");
+                            this.logAction("APPLY_INTEREST_DENIED", "User attempted to apply interest without permission");
+                        }
                         break;
 
                     case SORT_ACCOUNTS_BY_NAME:
-                        this.accountMgr.handleSortByName();
+                        if (this.hasPermission("SORT_ACCOUNTS_BY_NAME")) {
+                            this.accountMgr.handleSortByName();
+                        } else {
+                            System.out.println("✗ You do not have permission to sort accounts.");
+                            this.logAction("SORT_ACCOUNTS_BY_NAME_DENIED", "User attempted to sort accounts by name without permission");
+                        }
                         break;
 
                     case SORT_ACCOUNTS_BY_BALANCE:
-                        this.accountMgr.handleSortByBalance();
+                        if (this.hasPermission("SORT_ACCOUNTS_BY_BALANCE")) {
+                            this.accountMgr.handleSortByBalance();
+                        } else {
+                            System.out.println("✗ You do not have permission to sort accounts.");
+                            this.logAction("SORT_ACCOUNTS_BY_BALANCE_DENIED", "User attempted to sort accounts by balance without permission");
+                        }
                         break;
 
                     case VIEW_AUDIT_TRAIL:
@@ -274,7 +369,15 @@ public class BankingSystem {
 
                     // ===== SECURITY OPERATIONS (Both Roles) =====
                     case CHANGE_PASSWORD:
-                        this.handleChangePassword();
+                        if (this.hasPermission("CHANGE_PASSWORD")) {
+                            User updatedUser = this.authManager.handleChangePassword();
+                            if (updatedUser != null) {
+                                this.currentUser = updatedUser;  // Update currentUser reference
+                            }
+                        } else {
+                            System.out.println("✗ You do not have permission to change password.");
+                            this.logAction("CHANGE_PASSWORD_DENIED", "User attempted to change password without permission");
+                        }
                         break;
 
                     // ===== SESSION MANAGEMENT (Both Roles) =====
@@ -498,67 +601,6 @@ public class BankingSystem {
     public void logAction(String action, String details) {
         if (currentUser != null) {
             this.authManager.logAction(currentUser.getUsername(), currentUser.getUserRole(), action, details);
-        }
-    }
-
-    /**
-     * Handler: Change password for current user.
-     * Customers must change their auto-generated password on first login.
-     * Uses AuthenticationManager to create new User object (immutable pattern).
-     *
-     * Method calls:
-     * - Calls User.getUsername() to get current username
-     * - Calls InputValidator.getCancellableInput() for password prompts (twice)
-     * - Calls AuthenticationManager.changePassword() to create new User object
-     * - Calls User.setPasswordChangeRequired() to mark password as changed
-     */
-    private void handleChangePassword() {
-        System.out.println("\n--- CHANGE PASSWORD ---");
-
-        // Get current user
-        if (this.currentUser == null) {
-            System.out.println("✗ No user logged in");
-            return;
-        }
-
-        String username = this.currentUser.getUsername();
-
-        while (true) {  // OUTER RETRY LOOP
-            // Step 1: Prompt for current password
-            // Calls InputValidator.getCancellableInput() from this.validator
-            String oldPassword = this.validator.getCancellableInput("Enter current password");
-            if (oldPassword == null) return;  // User cancelled - exit immediately
-
-            // Step 2: Prompt for new password
-            // Calls InputValidator.getCancellableInput() from this.validator
-            String newPassword = this.validator.getCancellableInput("Enter new password");
-            if (newPassword == null) return;  // User cancelled - exit immediately
-
-            // Step 3: Call AuthenticationManager to change password (creates new User object)
-            // Calls AuthenticationManager.changePassword() - immutable pattern
-            User newUser = this.authManager.changePassword(username, oldPassword, newPassword);
-
-            if (newUser == null) {
-                System.out.println("✗ Password change failed.");
-
-                if (!this.validator.confirmAction("Try again?")) {
-                    return;  // User chose no - exit
-                }
-                // User chose yes - retry from top
-            } else {
-                // Step 4: Update currentUser reference to new User object
-                this.currentUser = newUser;
-
-                // Step 5: Set passwordChangeRequired to false (password has been changed)
-                // Calls User.setPasswordChangeRequired() on new user object
-                this.currentUser.setPasswordChangeRequired(false);
-
-                // Step 6: Success message
-                System.out.println("\n✓ Password changed successfully!");
-                System.out.println("  • You are still logged in with your new password");
-                System.out.println("  • New password will be used for all future logins\n");
-                break;  // Success - exit loop
-            }
         }
     }
 
