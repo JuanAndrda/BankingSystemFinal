@@ -824,101 +824,97 @@ Polymorphism allows objects of different types to be treated uniformly. The syst
 
 ### 1. Compile-Time Polymorphism (Method Overloading)
 
-Method overloading allows multiple methods with the same name but different parameters.
+Method overloading allows multiple methods with the **same name** but **different parameters**. The compiler selects which method to call based on the number, type, and order of arguments.
 
-#### Example 1: confirmAction() Overloading
+#### Example 1: getValidatedCustomer() Overloading
 
-**File:** `src/com/banking/BankingSystem.java:550-600`
+**File:** `src/com/banking/utilities/InputValidator.java:132-148`
 
 ```java
-// Overload 1: Simple yes/no confirmation
-private boolean confirmAction(String message) {
-    System.out.println("\n" + message);
-    System.out.print("→ Confirm (yes/no): ");
-    String response = scanner.nextLine().trim().toLowerCase();
-    return response.equals("yes") || response.equals("y");
+// Overload 1: No parameters - uses default error message
+public Customer getValidatedCustomer() {
+    return this.getValidatedCustomer("✗ Customer not found");  // Delegates to overload 2
 }
 
-// Overload 2: Enhanced confirmation with warning
-private boolean confirmAction(String message, String warningMessage) {
-    System.out.println("\n⚠ WARNING: " + warningMessage);
-    return confirmAction(message);  // Delegates to first overload
-}
+// Overload 2: One parameter - custom error message
+public Customer getValidatedCustomer(String errorMessage) {
+    String custId = this.getValidatedInput("Customer ID",
+            ValidationPatterns.CUSTOMER_ID_PATTERN,
+            "(format: " + ValidationPatterns.CUSTOMER_ID_FORMAT + " e.g., C001)");
+    if (custId == null) return null;  // User cancelled
 
-// Overload 3: Confirmation with custom prompt
-private boolean confirmAction(String message, String warningMessage, String customPrompt) {
-    System.out.println("\n⚠ WARNING: " + warningMessage);
-    System.out.println("\n" + message);
-    System.out.print("→ " + customPrompt + ": ");
-    String response = scanner.nextLine().trim().toLowerCase();
-    return response.equals("yes") || response.equals("y");
+    Customer customer = this.findCustomer(custId);
+    if (customer == null) {
+        System.out.println(errorMessage);  // Uses custom error message
+    }
+    return customer;
 }
 ```
 
 **Usage:**
 
 ```java
-// Simple confirmation
-if (confirmAction("Delete this account?")) {
-    // proceed
-}
+// Simple call - uses default error message
+Customer cust = validator.getValidatedCustomer();
 
-// Confirmation with warning
-if (confirmAction("Delete this customer?", "This will delete all associated accounts")) {
-    // proceed
-}
-
-// Confirmation with custom prompt
-if (confirmAction("Proceed with transfer?", "Amount exceeds $1000", "Type YES to confirm")) {
-    // proceed
-}
-```
-
-#### Example 2: getValidatedAccount() Overloading
-
-**File:** `src/com/banking/utilities/InputValidator.java:200-280`
-
-```java
-// Overload 1: Get any account by number
-public Account getValidatedAccount(LinkedList<Account> accounts) {
-    while (true) {
-        String accountNo = getValidatedString("Enter account number (or 'back'): ");
-        if (accountNo.equals("back")) return null;
-
-        Account account = findAccount(accounts, accountNo);
-        if (account != null) {
-            return account;
-        }
-        System.out.println("✗ Account not found");
-    }
-}
-
-// Overload 2: Get account with access control
-public Account getValidatedAccountWithAccessControl(User currentUser) {
-    LinkedList<Account> accessibleAccounts = getAccessibleAccounts(currentUser);
-    displayAccountList(accessibleAccounts);
-    return getValidatedAccount(accessibleAccounts);  // Delegates to first overload
-}
-
-// Overload 3: Get account of specific type
-public Account getValidatedAccount(LinkedList<Account> accounts, Class<?> accountType) {
-    while (true) {
-        Account account = getValidatedAccount(accounts);
-        if (account == null) return null;
-
-        if (accountType.isInstance(account)) {
-            return account;
-        }
-        System.out.println("✗ Account must be of type " + accountType.getSimpleName());
-    }
-}
+// Custom error message for specific context
+Customer cust = validator.getValidatedCustomer(
+    "✗ Customer not found. Cannot access profile.");
 ```
 
 **Benefits:**
-- ✓ **Same method name:** Logical grouping
-- ✓ **Different parameters:** Flexibility
-- ✓ **Compiler selects:** Based on argument types
-- ✓ **Code reuse:** Overloads can call each other
+- ✓ **Code reuse:** First overload delegates to second
+- ✓ **Default behavior:** Simple call when default message is fine
+- ✓ **Flexibility:** Custom messages for specific contexts
+
+---
+
+#### Example 2: getValidatedAccount() Overloading
+
+**File:** `src/com/banking/utilities/InputValidator.java:151-172`
+
+```java
+// Overload 1: No parameters - uses default error message
+public Account getValidatedAccount() {
+    return this.getValidatedAccount("✗ Account not found");  // Delegates to overload 2
+}
+
+// Overload 2: One parameter - custom error message
+public Account getValidatedAccount(String errorMessage) {
+    while (true) {
+        String accNo = this.getValidatedInput("Account Number",
+                ValidationPatterns.ACCOUNT_NO_PATTERN,
+                "(format: " + ValidationPatterns.ACCOUNT_NO_FORMAT + " e.g., ACC001)");
+        if (accNo == null) return null;  // User cancelled
+
+        Account account = AccountUtils.findAccount(this.accountList, accNo);
+        if (account == null) {
+            System.out.println(errorMessage);  // Custom error message
+            System.out.println("   Please try again or type 'back' to cancel.\n");
+            continue;  // RETRY
+        }
+        return account;  // Success
+    }
+}
+```
+
+**Usage:**
+
+```java
+// Simple call with default message
+Account acc = validator.getValidatedAccount();
+
+// Custom error message (TransactionProcessor.java:46)
+Account fromAccount = validator.getValidatedAccount(
+    "✗ Source account not found. Please verify and try again.");
+```
+
+**Benefits:**
+- ✓ **Same method name:** Both methods named `getValidatedAccount`
+- ✓ **Different parameters:** 0 parameters vs 1 String parameter
+- ✓ **Compiler selects:** Based on argument count at compile time
+- ✓ **Code reuse:** First overload delegates to second
+- ✓ **Convenience:** Default behavior without sacrificing flexibility
 
 ### 2. Runtime Polymorphism (Method Overriding)
 

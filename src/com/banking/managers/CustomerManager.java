@@ -21,30 +21,6 @@ public class CustomerManager {
         this.validator = validator;
         this.bankingSystem = null;  // Set later via setBankingSystem()
         this.accountMgr = null;     // Set later via setAccountManager()
-
-        // FIXED: Initialize counter properly by scanning existing customer IDs
-        // OLD APPROACH (BUGGY): this.customerIdCounter = customers.size() + 1;
-        // Problem: If you have customers C001, C002, C005 (size=3), counter becomes 4
-        //          Then generateNextCustomerId() would create C004, but what if C004 exists?
-        //
-        // NEW APPROACH: Find the highest existing customer ID and set counter to max+1
-        // This ensures no ID collisions even with gaps in the sequence
-        int maxCustomerId = 0;
-        for (Customer c : customers) {
-            String id = c.getCustomerId();
-            // Parse customer ID (format: C###)
-            if (id.startsWith("C") && id.length() == 4) {
-                try {
-                    int num = Integer.parseInt(id.substring(1));  // Extract ### from C###
-                    if (num > maxCustomerId) {
-                        maxCustomerId = num;  // Track highest number found
-                    }
-                } catch (NumberFormatException e) {
-                    // Ignore invalid customer IDs (safety check)
-                }
-            }
-        }
-        this.customerIdCounter = maxCustomerId + 1;  // Next customer ID will be max+1
     }
 
 
@@ -198,8 +174,8 @@ public class CustomerManager {
     public void handleCreateCustomerProfile() {
         UIFormatter.printSectionHeader("CREATE CUSTOMER PROFILE");
         String custId = this.validator.getValidatedInput("Customer ID (to link profile to):",
-                com.banking.utilities.ValidationPatterns.CUSTOMER_ID_PATTERN,
-                "(format: " + com.banking.utilities.ValidationPatterns.CUSTOMER_ID_FORMAT + " e.g., C001)");
+                ValidationPatterns.CUSTOMER_ID_PATTERN,
+                "(format: " + ValidationPatterns.CUSTOMER_ID_FORMAT + " e.g., C001)");
         if (custId == null) return;
 
         Customer customer = this.findCustomer(custId);

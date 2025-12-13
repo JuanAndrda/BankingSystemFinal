@@ -45,7 +45,7 @@ public enum MenuAction {
     VIEW_TRANSACTION_HISTORY("View Transaction History", 13, 5, null, MenuCategory.TRANSACTION_OPERATIONS),  // Both roles - customer sees as #5
 
     // ===== PROFILE OPERATIONS (Admin Only) =====
-    CREATE_CUSTOMER_PROFILE("Create/Update Customer Profile", 14, -1, UserRole.ADMIN, MenuCategory.PROFILE_OPERATIONS),
+    CREATE_CUSTOMER_PROFILE("Create Customer Profile", 14, -1, UserRole.ADMIN, MenuCategory.PROFILE_OPERATIONS),
     UPDATE_PROFILE_INFORMATION("Update Profile Information", 15, -1, UserRole.ADMIN, MenuCategory.PROFILE_OPERATIONS),
 
     // ===== REPORTS & UTILITIES (Admin Only) =====

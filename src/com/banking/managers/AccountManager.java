@@ -17,30 +17,6 @@ public class AccountManager {
         this.accountList = accountList;
         this.validator = validator;
         this.bankingSystem = null;  // Set later via setBankingSystem()
-
-        // FIXED: Initialize counter properly by scanning existing account numbers
-        // OLD APPROACH (BUGGY): this.accountCounter = accountList.size() + 1;
-        // Problem: If you have accounts ACC001, ACC002, ACC005 (size=3), counter becomes 4
-        //          Then generateNextAccountNumber() would create ACC004, but what if ACC004 exists?
-        //
-        // NEW APPROACH: Find the highest existing account number and set counter to max+1
-        // This ensures no ID collisions even with gaps in the sequence
-        int maxAccountNum = 0;
-        for (Account a : accountList) {
-            String accNo = a.getAccountNo();
-            // Parse account number (format: ACC###)
-            if (accNo.startsWith("ACC") && accNo.length() == 6) {
-                try {
-                    int num = Integer.parseInt(accNo.substring(3));  // Extract ### from ACC###
-                    if (num > maxAccountNum) {
-                        maxAccountNum = num;  // Track highest number found
-                    }
-                } catch (NumberFormatException e) {
-                    // Ignore invalid account numbers (safety check)
-                }
-            }
-        }
-        this.accountCounter = maxAccountNum + 1;  // Next account number will be max+1
     }
 
 
@@ -163,17 +139,6 @@ public class AccountManager {
     }
 
 
-    private void displayAccounts(String title) {
-        System.out.println("\n=== ACCOUNTS (" + title + ") ===");
-        if (this.accountList.isEmpty()) {
-            System.out.println("No accounts in the system.");
-        } else {
-            for (Account acc : this.accountList) {
-                System.out.println(acc.getDetails());
-            }
-        }
-    }
-
     private void insertionSortByName(LinkedList<Account> accountList) {
         // For each unsorted element (starting at index 1, first element already "sorted")
         for (int i = 1; i < accountList.size(); i++) {
@@ -181,9 +146,9 @@ public class AccountManager {
             Account currentAccount = accountList.get(i);
             String currentName = (currentAccount.getOwner() != null)
                     ? currentAccount.getOwner().getName() : "";
-
             // Find the correct position to insert currentAccount in sorted portion
             int j = i - 1;
+
             while (j >= 0) {
                 Account compareAccount = accountList.get(j);
                 String compareName = (compareAccount.getOwner() != null)
@@ -247,18 +212,6 @@ public class AccountManager {
             return;
         }
 
-        System.out.println("\n--- BEFORE SORTING ---");
-        System.out.println();
-        UIFormatter.printTableHeader("Account No", "Type", "Owner", "Balance");
-        for (Account account : this.accountList) {
-            String accountNo = account.getAccountNo();
-            String type = (account instanceof SavingsAccount) ? "Savings" : "Checking";
-            String owner = (account.getOwner() != null) ? account.getOwner().getName() : "N/A";
-            String balance = "$" + String.format("%.2f", account.getBalance());
-            UIFormatter.printTableRow(accountNo, type, owner, balance);
-        }
-        UIFormatter.printTableFooter();
-
         this.sortAccountsByName();
 
         System.out.println("\n--- AFTER SORTING (By Customer Name) ---");
@@ -285,18 +238,6 @@ public class AccountManager {
             UIFormatter.printInfo("No accounts found. Use option 5 (Create Account) to add one.");
             return;
         }
-
-        System.out.println("\n--- BEFORE SORTING ---");
-        System.out.println();
-        UIFormatter.printTableHeader("Account No", "Type", "Owner", "Balance");
-        for (Account account : this.accountList) {
-            String accountNo = account.getAccountNo();
-            String type = (account instanceof SavingsAccount) ? "Savings" : "Checking";
-            String owner = (account.getOwner() != null) ? account.getOwner().getName() : "N/A";
-            String balance = "$" + String.format("%.2f", account.getBalance());
-            UIFormatter.printTableRow(accountNo, type, owner, balance);
-        }
-        UIFormatter.printTableFooter();
 
         this.sortAccountsByBalance();
 

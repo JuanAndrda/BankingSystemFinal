@@ -41,7 +41,6 @@ public abstract class User {
 
     public String getUsername() { return this.username; }
     public UserRole getUserRole() { return this.userRole; }
-    public boolean isPasswordChangeRequired() { return this.passwordChangeRequired; }
 
     public void setPasswordChangeRequired(boolean required) {
         this.passwordChangeRequired = required;
