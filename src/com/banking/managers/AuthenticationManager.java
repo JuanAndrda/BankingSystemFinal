@@ -45,8 +45,7 @@ public class AuthenticationManager {
         userRegistry.add(user);
         // Log with the new user's username, include who registered them
         String registeredBy = (currentUser != null) ? currentUser.getUsername() : "SYSTEM";
-        logAction(user.getUsername(), user.getUserRole(), "USER_REGISTERED",
-                 "Registered by: " + registeredBy);
+        logAction(user.getUsername(), user.getUserRole(), "USER_REGISTERED", "Registered by: " + registeredBy);
         return true;
     }
 
@@ -89,8 +88,7 @@ public class AuthenticationManager {
                 loginAttempts++;
                 System.out.println("✗ Invalid credentials. Attempt " + loginAttempts + "/" + maxAttempts);
                 // Log failed attempt with the attempted username (role unknown for security)
-                logAction(username, null, "LOGIN_FAILED",
-                         "Failed attempt " + loginAttempts + "/" + maxAttempts);
+                logAction(null, null, "LOGIN_FAILED", "Failed attempt " + loginAttempts + "/" + maxAttempts);
             }
         }
 

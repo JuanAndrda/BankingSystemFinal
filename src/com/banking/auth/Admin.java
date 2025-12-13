@@ -35,6 +35,9 @@ public class Admin extends User {
         permissions.add("UPDATE_PROFILE_INFORMATION");
 
         // Transaction operations (viewing/managing)
+        permissions.add("DEPOSIT_MONEY");
+        permissions.add("WITHDRAW_MONEY");
+        permissions.add("TRANSFER_MONEY");
         permissions.add("VIEW_TRANSACTION_HISTORY");
 
         // Reporting & utilities

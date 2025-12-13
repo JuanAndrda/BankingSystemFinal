@@ -17,8 +17,7 @@ public class CheckingAccount extends Account {
         if (!this.validateAmount(amount)) return false;
 
         if (amount > this.getBalance() + this.overdraftLimit) {
-            System.out.println("✗ Exceeds overdraft limit. Available: $" +
-                    (this.getBalance() + this.overdraftLimit));
+            System.out.println("✗ Exceeds overdraft limit. Available: $" + (this.getBalance() + this.overdraftLimit));
             return false;
         }
 

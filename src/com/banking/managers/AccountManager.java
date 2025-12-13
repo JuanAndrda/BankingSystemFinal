@@ -95,15 +95,11 @@ public class AccountManager {
         // Create the account using core CRUD method
         Account account = this.createAccount(customer.getCustomerId(), accountType, accountNo);
         if (account != null) {
-            UIFormatter.printSuccess("Account successfully created and linked to customer!",
-                    "Account Number: " + accountNo,
-                    "Type: " + accountType,
-                    "Balance: $0.00");
+            UIFormatter.printSuccess("Account successfully created and linked to customer!", "Account Number: " + accountNo, "Type: " + accountType, "Balance: $0.00");
 
             // Log the action
             if (this.bankingSystem.getCurrentUser() != null) {
-                this.bankingSystem.logAction("CREATE_ACCOUNT",
-                        "Account: " + accountNo + " Type: " + accountType + " Customer: " + customer.getCustomerId());
+                this.bankingSystem.logAction("CREATE_ACCOUNT", "Account: " + accountNo + " Type: " + accountType + " Customer: " + customer.getCustomerId());
             }
         }
         return account;
@@ -129,10 +125,6 @@ public class AccountManager {
 
     public Account findAccount(String accountNo) {
         return AccountUtils.findAccount(this.accountList, accountNo);
-    }
-
-    public boolean validateAccountExists(String accountNo) {
-        return this.findAccount(accountNo) != null;
     }
 
 
@@ -224,8 +216,7 @@ public class AccountManager {
         UIFormatter.printTableFooter();
         System.out.println();
 
-        InputValidator.safeLogAction(bankingSystem, "SORT_ACCOUNTS_BY_NAME",
-            "Sorted " + this.accountList.size() + " accounts by customer name");
+        InputValidator.safeLogAction(bankingSystem, "SORT_ACCOUNTS_BY_NAME", "Sorted " + this.accountList.size() + " accounts by customer name");
     }
 
     public void handleSortByBalance() {
@@ -269,11 +260,7 @@ public class AccountManager {
                 double newBalance = savings.getBalance();
                 double interestEarned = newBalance - oldBalance;
 
-                interestResults.add(new String[]{
-                    savings.getAccountNo(),
-                    "$" + String.format("%.2f", oldBalance),
-                    "$" + String.format("%.2f", newBalance),
-                    "$" + String.format("%.2f", interestEarned)
+                interestResults.add(new String[]{savings.getAccountNo(), "$" + String.format("%.2f", oldBalance), "$" + String.format("%.2f", newBalance), "$" + String.format("%.2f", interestEarned)
                 });
             }
         }
@@ -293,14 +280,10 @@ public class AccountManager {
         }
         UIFormatter.printTableFooter();
 
-        UIFormatter.printSuccessEnhanced(
-            "Interest applied successfully!",
-            "Accounts Updated: " + interestResults.size(),
-            "Status: Completed"
+        UIFormatter.printSuccessEnhanced("Interest applied successfully!", "Accounts Updated: " + interestResults.size(), "Status: Completed"
         );
 
-        InputValidator.safeLogAction(bankingSystem, "APPLY_INTEREST",
-            "Interest applied to " + interestResults.size() + " savings account(s)");
+        InputValidator.safeLogAction(bankingSystem, "APPLY_INTEREST", "Interest applied to " + interestResults.size() + " savings account(s)");
     }
 
     public boolean updateOverdraftLimit(String accountNo, double newLimit) {
@@ -332,8 +315,7 @@ public class AccountManager {
         // Unified retry loop: handles BOTH "not found" AND "wrong type"
         Account account = null;
         while (account == null) {
-            String accNo = this.validator.getValidatedInput("Account Number (Checking account only):",
-                    com.banking.utilities.ValidationPatterns.ACCOUNT_NO_PATTERN,
+            String accNo = this.validator.getValidatedInput("Account Number (Checking account only):", ValidationPatterns.ACCOUNT_NO_PATTERN,
                     "(format: " + com.banking.utilities.ValidationPatterns.ACCOUNT_NO_FORMAT + " e.g., ACC001)");
             if (accNo == null) return;  // User cancelled
 
@@ -380,8 +362,7 @@ public class AccountManager {
 
         while (true) {  // OUTER RETRY LOOP
             // Step 1: Get the customer
-            Customer customer = this.validator.getValidatedCustomer(
-                    "✗ Customer not found. Please create customer first (Option 1).");
+            Customer customer = this.validator.getValidatedCustomer("✗ Customer not found. Please create customer first (Option 1).");
             if (customer == null) return;  // User cancelled - exit immediately
 
             // Step 2: Get account type from user
@@ -445,31 +426,23 @@ public class AccountManager {
 
         Customer owner = account.getOwner();
         UIFormatter.printLeftAlignedLine("  Account Number:     " + account.getAccountNo(), 0);
-        UIFormatter.printLeftAlignedLine("  Account Type:       " +
-            (account instanceof SavingsAccount ? "SAVINGS" : "CHECKING"), 0);
-        UIFormatter.printLeftAlignedLine("  Owner:              " +
-            (owner != null ? owner.getName() : "NO OWNER"), 0);
-        UIFormatter.printLeftAlignedLine("  Owner ID:           " +
-            (owner != null ? owner.getCustomerId() : "N/A"), 0);
-        UIFormatter.printLeftAlignedLine("  Current Balance:    $" +
-            String.format("%.2f", account.getBalance()), 0);
+        UIFormatter.printLeftAlignedLine("  Account Type:       " + (account instanceof SavingsAccount ? "SAVINGS" : "CHECKING"), 0);
+        UIFormatter.printLeftAlignedLine("  Owner:              " + (owner != null ? owner.getName() : "NO OWNER"), 0);
+        UIFormatter.printLeftAlignedLine("  Owner ID:           " + (owner != null ? owner.getCustomerId() : "N/A"), 0);
+        UIFormatter.printLeftAlignedLine("  Current Balance:    $" + String.format("%.2f", account.getBalance()), 0);
 
         // Type-specific details
         if (account instanceof SavingsAccount) {
             SavingsAccount savings = (SavingsAccount) account;
-            UIFormatter.printLeftAlignedLine("  Interest Rate:      " +
-                String.format("%.2f%%", savings.getInterestRate() * 100), 0);
+            UIFormatter.printLeftAlignedLine("  Interest Rate:      " + String.format("%.2f%%", savings.getInterestRate() * 100), 0);
         } else if (account instanceof CheckingAccount) {
             CheckingAccount checking = (CheckingAccount) account;
-            UIFormatter.printLeftAlignedLine("  Overdraft Limit:    $" +
-                String.format("%.2f", checking.getOverdraftLimit()), 0);
-            UIFormatter.printLeftAlignedLine("  Available Credit:   $" +
-                String.format("%.2f", checking.getBalance() + checking.getOverdraftLimit()), 0);
+            UIFormatter.printLeftAlignedLine("  Overdraft Limit:    $" + String.format("%.2f", checking.getOverdraftLimit()), 0);
+            UIFormatter.printLeftAlignedLine("  Available Credit:   $" + String.format("%.2f", checking.getBalance() + checking.getOverdraftLimit()), 0);
         }
 
         LinkedList<Transaction> txHistory = account.getTransactionHistory();
-        UIFormatter.printLeftAlignedLine("  Total Transactions: " +
-            (txHistory != null ? txHistory.size() : 0), 0);
+        UIFormatter.printLeftAlignedLine("  Total Transactions: " + (txHistory != null ? txHistory.size() : 0), 0);
 
         UIFormatter.printBottomBorder();
         System.out.println();
@@ -480,17 +453,12 @@ public class AccountManager {
 
         Account account = null;
         while (account == null) {  // RETRY LOOP for account lookup
-            String accNo = this.validator.getValidatedInputWithFeedback(
-                    "Account Number:",
-                    com.banking.utilities.ValidationPatterns.ACCOUNT_NO_PATTERN,
-                    "(format: " + com.banking.utilities.ValidationPatterns.ACCOUNT_NO_FORMAT + " e.g., ACC001)");
+            String accNo = this.validator.getValidatedInputWithFeedback("Account Number:", ValidationPatterns.ACCOUNT_NO_PATTERN, "(format: " + ValidationPatterns.ACCOUNT_NO_FORMAT + " e.g., ACC001)");
             if (accNo == null) return;  // User cancelled - exit immediately
 
             account = this.findAccount(accNo);
             if (account == null) {
-                UIFormatter.printErrorEnhanced(
-                        "Account does not exist",
-                        "Use 'View All Accounts' to see valid account numbers.");
+                UIFormatter.printErrorEnhanced("Account does not exist", "Use 'View All Accounts' to see valid account numbers.");
 
                 if (!this.validator.confirmAction("Try again?")) {
                     return;  // User chose no - exit
@@ -508,9 +476,7 @@ public class AccountManager {
         System.out.println();
 
         // Enhanced confirmation
-        if (!this.validator.confirmActionEnhanced(
-                "Are you sure you want to delete account " + account.getAccountNo() + "?",
-                "This action cannot be undone. All transaction history will be lost.")) {
+        if (!this.validator.confirmActionEnhanced("Are you sure you want to delete account " + account.getAccountNo() + "?", "This action cannot be undone. All transaction history will be lost.")) {
             return;
         }
 
@@ -518,16 +484,11 @@ public class AccountManager {
         boolean success = this.deleteAccount(account.getAccountNo());
 
         if (success) {
-            UIFormatter.printSuccessEnhanced(
-                    "Account deleted successfully!",
-                    "Account Number: " + account.getAccountNo(),
-                    "Owner: " + (account.getOwner() != null ? account.getOwner().getName() : "N/A"),
-                    "Status: Deleted");
+            UIFormatter.printSuccessEnhanced("Account deleted successfully!", "Account Number: " + account.getAccountNo(), "Owner: " +
+                    (account.getOwner() != null ? account.getOwner().getName() : "N/A"), "Status: Deleted");
             InputValidator.safeLogAction(bankingSystem, "DELETE_ACCOUNT", "Account: " + account.getAccountNo());
         } else {
-            UIFormatter.printErrorEnhanced(
-                    "Failed to delete account",
-                    "The account may have dependencies. Please try again.");
+            UIFormatter.printErrorEnhanced("Failed to delete account", "The account may have dependencies. Please try again.");
         }
     }
 

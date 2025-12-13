@@ -60,17 +60,4 @@ public enum MenuCategory {
     public int getDisplayOrder() {
         return displayOrder;
     }
-
-    /**
-     * Checks if this category is available for the given user role.
-     *
-     * @param role The user role to check
-     * @return true if category is available for this role
-     */
-    public boolean isAvailableFor(UserRole role) {
-        if (requiredRole == null) {
-            return true;  // Available to all roles
-        }
-        return requiredRole == role;  // Must match required role
-    }
 }

@@ -109,26 +109,6 @@ public class BankingSystem {
     }
 
     // ===== MAIN ENTRY POINT: CONSOLE MENU =====
-    /**
-     * Runs the interactive console menu for the Banking System.
-     * Displays role-based menu options with dual numbering system.
-     * Uses MenuAction enum for type-safe, role-aware menu handling.
-     * Scanner is injected via constructor (Dependency Injection).
-     *
-     * KEY IMPROVEMENTS:
-     * - DUAL NUMBERING: Customers see 1-7, 0 | Admins see 1-21, 0
-     * - SINGLE PERMISSION CHECK: No repeated role checks in switch statement
-     * - TYPE SAFETY: Switch on MenuAction enum (not magic numbers)
-     * - ROLE-AWARE LOOKUP: fromMenuNumber(int, UserRole) maps input correctly
-     *
-     * OOP Principles Demonstrated:
-     * - ENCAPSULATION: Menu logic centralized in MenuAction enum
-     * - ABSTRACTION: Complex dual numbering hidden behind simple interface
-     * - POLYMORPHISM: Same code handles both roles differently
-     * - FACADE PATTERN: Simplified interface to complex subsystems
-     *
-     * @return MenuAction indicating whether user chose LOGOUT or EXIT_APPLICATION
-     */
     public MenuAction runConsoleMenu() {
         // Require login before accessing menu
         User loggedInUser = this.login();
@@ -148,9 +128,7 @@ public class BankingSystem {
             System.out.println("\n┌─ MAIN MENU ─────────────────────────────────────");
 
             // Display menu based on user role using MenuBuilder (auto-generated from MenuAction enum)
-            String menuTitle = (this.currentUser.getUserRole() == UserRole.ADMIN)
-                ? "BANKING MANAGEMENT SYSTEM"
-                : "TRANSACTION MENU (ATM Mode)";
+            String menuTitle = (this.currentUser.getUserRole() == UserRole.ADMIN) ? "BANKING MANAGEMENT SYSTEM" : "TRANSACTION MENU (ATM Mode)";
             MenuBuilder.displayMenu(this.currentUser.getUserRole(), menuTitle);
 
             System.out.println("└─────────────────────────────────────────────────");

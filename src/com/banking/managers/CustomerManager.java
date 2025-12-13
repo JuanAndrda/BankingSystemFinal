@@ -96,10 +96,6 @@ public class CustomerManager {
         return null;
     }
 
-    public boolean validateCustomerExists(String customerId) {
-        return this.findCustomer(customerId) != null;
-    }
-
     public boolean deleteCustomer(String customerId) {
         // Calls this.findCustomer() to search LinkedList
         Customer customer = this.findCustomer(customerId);
@@ -170,9 +166,7 @@ public class CustomerManager {
 
     public void handleCreateCustomerProfile() {
         UIFormatter.printSectionHeader("CREATE CUSTOMER PROFILE");
-        String custId = this.validator.getValidatedInput("Customer ID (to link profile to):",
-                ValidationPatterns.CUSTOMER_ID_PATTERN,
-                "(format: " + ValidationPatterns.CUSTOMER_ID_FORMAT + " e.g., C001)");
+        String custId = this.validator.getValidatedInput("Customer ID (to link profile to):", ValidationPatterns.CUSTOMER_ID_PATTERN, "(format: " + ValidationPatterns.CUSTOMER_ID_FORMAT + " e.g., C001)");
         if (custId == null) return;
 
         Customer customer = this.findCustomer(custId);
@@ -317,17 +311,11 @@ public class CustomerManager {
 
         UIFormatter.printBlankLine();
         UIFormatter.printBoxTitle("CUSTOMER CREATION SUCCESSFUL");
-        UIFormatter.printSuccess("Customer Information:",
-                "Customer ID:     " + custId,
-                "Customer Name:   " + custName);
-        UIFormatter.printSuccess("Login Credentials (System Generated):",
-                "Username:        " + username,
-                "Temp Password:   " + tempPassword,
-                "Note: Customer MUST change password on first login");
+        UIFormatter.printSuccess("Customer Information:", "Customer ID:     " + custId, "Customer Name:   " + custName);
+        UIFormatter.printSuccess("Login Credentials (System Generated):", "Username:        " + username, "Temp Password:   " + tempPassword, "Note: Customer MUST change password on first login");
 
         // Log the action
-        InputValidator.safeLogAction(bankingSystem, "CREATE_CUSTOMER",
-                "Customer ID: " + custId + " Name: " + custName + " Username: " + username);
+        InputValidator.safeLogAction(bankingSystem, "CREATE_CUSTOMER", "Customer ID: " + custId + " Name: " + custName + " Username: " + username);
 
         // Step 7-10: Integrated Onboarding Workflow
         boolean profileCreated = this.promptAndCreateProfile(newCustomer);
@@ -391,11 +379,7 @@ public class CustomerManager {
             UIFormatter.printLeftAlignedLine("  No accounts. Use option 5 (Create Account) to add one.", 2);
         } else {
             for (Account acc : accounts) {
-                String accInfo = String.format("  %s %s (%s) - Balance: $%.2f",
-                        UIFormatter.BULLET,
-                        acc.getAccountNo(),
-                        acc instanceof SavingsAccount ? "Savings" : "Checking",
-                        acc.getBalance());
+                String accInfo = String.format("  %s %s (%s) - Balance: $%.2f", UIFormatter.BULLET, acc.getAccountNo(), acc instanceof SavingsAccount ? "Savings" : "Checking", acc.getBalance());
                 UIFormatter.printLeftAlignedLine(accInfo, 0);
             }
         }
@@ -442,17 +426,12 @@ public class CustomerManager {
 
         Customer customer = null;
         while (customer == null) {  // RETRY LOOP for customer lookup
-            String custId = this.validator.getValidatedInputWithFeedback(
-                    "Customer ID:",
-                    com.banking.utilities.ValidationPatterns.CUSTOMER_ID_PATTERN,
-                    "(format: " + com.banking.utilities.ValidationPatterns.CUSTOMER_ID_FORMAT + " e.g., C001)");
+            String custId = this.validator.getValidatedInputWithFeedback("Customer ID:", ValidationPatterns.CUSTOMER_ID_PATTERN, "(format: " + ValidationPatterns.CUSTOMER_ID_FORMAT + " e.g., C001)");
             if (custId == null) return;  // User cancelled - exit immediately
 
             customer = this.findCustomer(custId);
             if (customer == null) {
-                UIFormatter.printErrorEnhanced(
-                        "Customer does not exist",
-                        "Use 'View All Customers' to see valid customer IDs.");
+                UIFormatter.printErrorEnhanced("Customer does not exist", "Use 'View All Customers' to see valid customer IDs.");
 
                 if (!this.validator.confirmAction("Try again?")) {
                     return;  // User chose no - exit
@@ -471,13 +450,9 @@ public class CustomerManager {
         System.out.println();
 
         // Enhanced confirmation with warning
-        String warningText = (accountCount > 0)
-                ? "This will also delete all " + accountCount + " associated account(s) and transaction history."
-                : null;
+        String warningText = (accountCount > 0) ? "This will also delete all " + accountCount + " associated account(s) and transaction history." : null;
 
-        if (!this.validator.confirmActionEnhanced(
-                "Are you sure you want to delete customer " + customer.getCustomerId() + "?",
-                warningText)) {
+        if (!this.validator.confirmActionEnhanced("Are you sure you want to delete customer " + customer.getCustomerId() + "?", warningText)) {
             return;
         }
 
@@ -485,17 +460,10 @@ public class CustomerManager {
         boolean deleted = this.deleteCustomer(customer.getCustomerId());
 
         if (deleted) {
-            UIFormatter.printSuccessEnhanced(
-                    "Customer deleted successfully!",
-                    "Customer ID: " + customer.getCustomerId(),
-                    "Name: " + customer.getName(),
-                    "Associated Accounts Deleted: " + accountCount,
-                    "Status: Deleted");
+            UIFormatter.printSuccessEnhanced("Customer deleted successfully!", "Customer ID: " + customer.getCustomerId(), "Name: " + customer.getName(), "Associated Accounts Deleted: " + accountCount, "Status: Deleted");
             InputValidator.safeLogAction(bankingSystem, "DELETE_CUSTOMER", "Customer ID: " + customer.getCustomerId());
         } else {
-            UIFormatter.printErrorEnhanced(
-                    "Failed to delete customer",
-                    "Please try again or contact support.");
+            UIFormatter.printErrorEnhanced("Failed to delete customer", "Please try again or contact support.");
         }
     }
 
@@ -517,9 +485,7 @@ public class CustomerManager {
         try {
             CustomerProfile profile = new CustomerProfile(profileId, address, phone, email);
             customer.setProfile(profile);
-            UIFormatter.printSuccess("Profile created and linked to customer!",
-                    "Profile ID: " + profileId,
-                    "Email: " + email);
+            UIFormatter.printSuccess("Profile created and linked to customer!", "Profile ID: " + profileId, "Email: " + email);
             return true;
         } catch (IllegalArgumentException e) {
             UIFormatter.printError("Error creating profile: " + e.getMessage());

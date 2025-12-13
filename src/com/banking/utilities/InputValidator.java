@@ -1,5 +1,6 @@
 package com.banking.utilities;
 
+import com.banking.BankingSystem;
 import com.banking.models.*;
 import com.banking.auth.User;
 import com.banking.auth.UserAccount;
@@ -135,9 +136,7 @@ public class InputValidator {
 
     // Get validated customer with custom error message (overloaded)
     public Customer getValidatedCustomer(String errorMessage) {
-        String custId = this.getValidatedInput("Customer ID",
-                ValidationPatterns.CUSTOMER_ID_PATTERN,
-                "(format: " + ValidationPatterns.CUSTOMER_ID_FORMAT + " e.g., C001)");
+        String custId = this.getValidatedInput("Customer ID", ValidationPatterns.CUSTOMER_ID_PATTERN, "(format: " + ValidationPatterns.CUSTOMER_ID_FORMAT + " e.g., C001)");
         if (custId == null) return null;  // User cancelled
 
         Customer customer = this.findCustomer(custId);
@@ -156,9 +155,7 @@ public class InputValidator {
     // Includes retry loop for both format validation and account existence
     public Account getValidatedAccount(String errorMessage) {
         while (true) {
-            String accNo = this.getValidatedInput("Account Number",
-                    ValidationPatterns.ACCOUNT_NO_PATTERN,
-                    "(format: " + ValidationPatterns.ACCOUNT_NO_FORMAT + " e.g., ACC001)");
+            String accNo = this.getValidatedInput("Account Number", ValidationPatterns.ACCOUNT_NO_PATTERN, "(format: " + ValidationPatterns.ACCOUNT_NO_FORMAT + " e.g., ACC001)");
             if (accNo == null) return null;  // User cancelled
 
             Account account = AccountUtils.findAccount(this.accountList, accNo);
@@ -173,11 +170,9 @@ public class InputValidator {
 
     // Get validated account with descriptive label
     // Includes retry loop for both format validation and account existence
-    public Account getValidatedAccountWithLabel(String label, String errorMessage) {
+    public Account getValidatedAccount(String label, String errorMessage) {
         while (true) {
-            String accNo = this.getValidatedInput(label,
-                    ValidationPatterns.ACCOUNT_NO_PATTERN,
-                    "(format: " + ValidationPatterns.ACCOUNT_NO_FORMAT + " e.g., ACC001)");
+            String accNo = this.getValidatedInput(label, ValidationPatterns.ACCOUNT_NO_PATTERN, "(format: " + ValidationPatterns.ACCOUNT_NO_FORMAT + " e.g., ACC001)");
             if (accNo == null) return null;  // User cancelled
 
             Account account = AccountUtils.findAccount(this.accountList, accNo);
@@ -218,8 +213,7 @@ public class InputValidator {
 
     // Get validated customer with profile
     public Customer getValidatedCustomerWithProfile() {
-        Customer customer = this.getValidatedCustomer(
-                "✗ Customer not found. Cannot access profile.");
+        Customer customer = this.getValidatedCustomer("✗ Customer not found. Cannot access profile.");
         if (customer == null) return null;
 
         if (customer.getProfile() == null) {
@@ -264,20 +258,18 @@ public class InputValidator {
             // Show available accounts
             System.out.println("\nYour accounts:");
             int index = 1;
-            for (com.banking.models.Account acc : customerAccounts) {
+            for (Account acc : customerAccounts) {
                 System.out.println("  " + index + ". " + acc.getAccountNo() + " (" + acc.getDetails() + ")");
                 index++;
             }
 
             // Retry loop for account selection
             while (true) {
-                String accNo = this.getValidatedInput("Account Number",
-                        ValidationPatterns.ACCOUNT_NO_PATTERN,
-                        "(format: " + ValidationPatterns.ACCOUNT_NO_FORMAT + " e.g., ACC001)");
+                String accNo = this.getValidatedInput("Account Number", ValidationPatterns.ACCOUNT_NO_PATTERN, "(format: " + ValidationPatterns.ACCOUNT_NO_FORMAT + " e.g., ACC001)");
                 if (accNo == null) return null;  // User cancelled
 
                 // Verify the chosen account belongs to this customer
-                for (com.banking.models.Account acc : customerAccounts) {
+                for (Account acc : customerAccounts) {
                     if (acc.getAccountNo().equals(accNo)) {
                         return acc;  // Success
                     }
@@ -320,7 +312,7 @@ public class InputValidator {
     }
 
     // Safely log action with null-safety check
-    public static void safeLogAction(com.banking.BankingSystem bankingSystem, String action, String details) {
+    public static void safeLogAction(BankingSystem bankingSystem, String action, String details) {
         if (bankingSystem != null && bankingSystem.getCurrentUser() != null) {
             bankingSystem.logAction(action, details);
         }
@@ -328,26 +320,6 @@ public class InputValidator {
 
     // ===== ENHANCED INPUT VALIDATION METHODS (Phase 3 Improvements) =====
 
-    /**
-     * Enhanced confirmation with warning message displayed in styled box.
-     * Provides better user feedback for critical operations.
-     *
-     * Example:
-     * <pre>
-     * ⚠ WARNING: This action cannot be undone
-     *
-     * ╔══════════════════════════════════════════════════════════════════╗
-     * ║  ⚠ CONFIRMATION REQUIRED                                        ║
-     * ╠══════════════════════════════════════════════════════════════════╣
-     * ║  Are you sure you want to delete account ACC001?                ║
-     * ╚══════════════════════════════════════════════════════════════════╝
-     * → Your choice (yes/no): _
-     * </pre>
-     *
-     * @param message Confirmation question
-     * @param warningText Warning text to display before prompt (can be null)
-     * @return true if user confirmed, false otherwise
-     */
     public boolean confirmActionEnhanced(String message, String warningText) {
         // Display warning box once (before retry loop)
         if (warningText != null && !warningText.isEmpty()) {
@@ -381,25 +353,6 @@ public class InputValidator {
         }
     }
 
-    /**
-     * Get validated input with real-time format feedback.
-     * Shows checkmark when format is correct, error when incorrect.
-     *
-     * Example interaction:
-     * <pre>
-     * → Account Number (format: ACC###): xyz
-     *   ✗ Invalid format! (format: ACC###)
-     *    Please try again or type 'back' to cancel.
-     *
-     * → Account Number (format: ACC###): ACC001
-     *   ✓ Format correct!
-     * </pre>
-     *
-     * @param prompt Field name
-     * @param pattern Regex pattern
-     * @param formatHint Format hint text
-     * @return Validated input or null if cancelled
-     */
     public String getValidatedInputWithFeedback(String prompt, String pattern, String formatHint) {
         while (true) {
             System.out.print(UIFormatter.INFO + " " + prompt + " " + formatHint + ": ");

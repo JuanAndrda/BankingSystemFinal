@@ -45,10 +45,18 @@ public class Customer {
     }
 
     // Getters
-    public LinkedList<Account> getAccounts() { return this.accounts; }
-    public String getCustomerId() { return this.customerId; }
-    public String getName() { return this.name; }
-    public CustomerProfile getProfile() { return this.profile; }
+    public LinkedList<Account> getAccounts() {
+        return this.accounts;
+    }
+    public String getCustomerId() {
+        return this.customerId;
+    }
+    public String getName() {
+        return this.name;
+    }
+    public CustomerProfile getProfile() {
+        return this.profile;
+    }
 
     // Setters with validation
     public void setCustomerId(String customerId) {

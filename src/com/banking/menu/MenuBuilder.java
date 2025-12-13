@@ -11,24 +11,6 @@ import java.util.*;
  *
  * This utility class eliminates manual menu synchronization issues by
  * automatically generating role-appropriate menus from the MenuAction enum.
- *
- * OOP Principles Demonstrated:
- * - BUILDER PATTERN: Constructs complex menu displays step-by-step
- * - SINGLE RESPONSIBILITY: Only handles menu display generation
- * - DRY PRINCIPLE: Eliminates duplicate menu construction code
- * - ENCAPSULATION: Hides complex menu generation logic
- * - COMPOSITION: Uses CategoryGroup helper class to group actions
- *
- * Data Structures Used:
- * - ArrayList<CategoryGroup> for category grouping (preserves insertion order)
- * - CategoryGroup helper class encapsulates category and actions
- * - Insertion sort for ordering categories (consistent with AccountManager)
- * - ArrayList for dynamic menu item arrays
- * - Enum for type-safe categories
- *
- * Academic Rubric Alignment:
- * - CC 204: Demonstrates ArrayList (dynamic arrays), insertion sort
- * - CIT 207: Builder pattern, encapsulation, composition, helper classes
  */
 public class MenuBuilder {
 
@@ -180,83 +162,5 @@ public class MenuBuilder {
 
         // Display using UIFormatter for consistency
         UIFormatter.printMenuSection(category.getDisplayName(), menuItems);
-    }
-
-    /**
-     * Validates that all MenuActions are properly categorized.
-     * Useful for compile-time verification during development.
-     *
-     * This method can be called during application startup to ensure
-     * menu system integrity.
-     *
-     * @return true if all actions have valid categories
-     */
-    public static boolean validateMenuCompleteness() {
-        boolean allValid = true;
-
-        for (MenuAction action : MenuAction.values()) {
-            if (action.getCategory() == null) {
-                System.err.println("ERROR: MenuAction " + action + " has no category!");
-                allValid = false;
-            }
-        }
-
-        if (allValid) {
-            System.out.println("✓ Menu validation passed: All actions properly categorized");
-        }
-
-        return allValid;
-    }
-
-    /**
-     * Prints menu statistics for debugging/analysis.
-     * Useful during development to verify menu structure.
-     */
-    public static void printMenuStats() {
-        System.out.println("\n=== MENU STATISTICS ===");
-
-        // Count total actions
-        System.out.println("Total menu actions: " + MenuAction.values().length);
-
-        // Count by role
-        int adminActions = 0;
-        int customerActions = 0;
-        int sharedActions = 0;
-
-        for (MenuAction action : MenuAction.values()) {
-            if (action.isAvailableFor(UserRole.ADMIN)) adminActions++;
-            if (action.isAvailableFor(UserRole.CUSTOMER)) customerActions++;
-            if (action.isAvailableFor(UserRole.ADMIN) && action.isAvailableFor(UserRole.CUSTOMER)) {
-                sharedActions++;
-            }
-        }
-
-        System.out.println("Admin-accessible actions: " + adminActions);
-        System.out.println("Customer-accessible actions: " + customerActions);
-        System.out.println("Shared actions: " + sharedActions);
-
-        // Count by category
-        System.out.println("\n=== ACTIONS BY CATEGORY ===");
-        ArrayList<CategoryGroup> categoryGroups = new ArrayList<>();
-
-        for (MenuAction action : MenuAction.values()) {
-            MenuCategory category = action.getCategory();
-
-            CategoryGroup group = findCategoryGroup(categoryGroups, category);
-            if (group == null) {
-                group = new CategoryGroup(category);
-                categoryGroups.add(group);
-            }
-            group.addAction(action);
-        }
-
-        // Sort category groups
-        sortCategoryGroups(categoryGroups);
-
-        for (CategoryGroup group : categoryGroups) {
-            System.out.println(group.getCategory().getDisplayName() + ": " + group.size() + " actions");
-        }
-
-        System.out.println("======================\n");
     }
 }

@@ -12,7 +12,7 @@ This script provides exact wording for your presentation. Feel free to adapt the
 
 **Timing Guidelines:**
 - Introduction: 2 minutes
-- OOP Principles: 4 minutes
+- OOP Principles: 5-6 minutes (includes detailed polymorphism examples)
 - Data Structures: 3 minutes
 - Live Demo: 5 minutes
 - Q&A: 5+ minutes (remaining time)
@@ -95,27 +95,88 @@ These abstract classes define abstract methods that subclasses must implement. F
 
 Similarly, Account declares an abstract method called withdraw(). Each subclass implements withdrawal logic appropriate to its account type, which leads us to the fourth principle - polymorphism."
 
-### 2.4 Polymorphism (1 minute 15 seconds)
+### 2.4 Polymorphism (2 minutes 30 seconds)
 
 "Fourth, and most importantly, **Polymorphism**.
 
+Polymorphism means 'many forms' - the same method behaves differently based on context. My system demonstrates both types of polymorphism: **Method Overriding** and **Method Overloading**.
+
+#### Method Overriding - Runtime Polymorphism
+
 [Show SavingsAccount.withdraw() and CheckingAccount.withdraw() code]
 
-Polymorphism means 'many forms' - the same method name behaves differently based on the object type.
+Let me show you three examples of method overriding from the codebase.
 
-Look at the withdraw() method. Both SavingsAccount and CheckingAccount inherit from Account and override the withdraw() method. However, they implement different business logic.
+**Example 1: withdraw() method**
 
-In **SavingsAccount**, the withdraw() method checks if the current balance is greater than or equal to the withdrawal amount. If not, the withdrawal fails. SavingsAccount does NOT allow overdrafts.
+Both SavingsAccount and CheckingAccount inherit from Account and override the withdraw() method with different business logic.
 
-[Point to code: `if (balance >= amount)`]
+In **SavingsAccount** at line 22, the withdraw() method checks if the amount is less than or equal to the current balance. SavingsAccount does NOT allow overdrafts.
 
-In **CheckingAccount**, the withdraw() method checks if the balance PLUS the overdraft limit is greater than or equal to the withdrawal amount. This allows the account to go negative, up to the overdraft limit.
+[Point to code: `if (amount > this.getBalance())`]
 
-[Point to code: `if (balance + overdraftLimit >= amount)`]
+In **CheckingAccount** at line 16, the withdraw() method checks if the amount is within balance PLUS overdraft limit. This allows the account to go negative, up to the overdraft limit.
 
-This is polymorphism in action. At runtime, when you call account.withdraw(), Java determines which version to execute based on whether the account object is a SavingsAccount or a CheckingAccount. Same method name, different behavior.
+[Point to code: `if (amount > this.getBalance() + this.overdraftLimit)`]
 
-I'll demonstrate this live in just a moment when we do the system demo - you'll see the same withdraw operation succeed on a CheckingAccount but fail on a SavingsAccount when funds are insufficient."
+Same method name, different behavior based on object type.
+
+**Example 2: getDetails() method**
+
+Both account subclasses also override getDetails() to provide type-specific information.
+
+[Show code if possible]
+
+SavingsAccount's getDetails() at line 37 returns '[SAVINGS]' with interest rate information. CheckingAccount's getDetails() at line 31 returns '[CHECKING]' with overdraft limit information. Both call super.getDetails() for common information, then add their specific details. This is proper use of method overriding with code reuse.
+
+**Example 3: getPermissions() method**
+
+In the User hierarchy, both Admin and UserAccount override the abstract getPermissions() method.
+
+[Show Admin.java and UserAccount.java if possible]
+
+Admin's getPermissions() at Admin.java line 13 returns a full permission list with 22 operations. UserAccount's getPermissions() at UserAccount.java line 28 returns a limited permission list with only 7 operations. Same method signature, completely different permission sets. This is runtime polymorphism powering the role-based access control system.
+
+#### Method Overloading - Compile-Time Polymorphism
+
+Now let me show you method overloading - same method name, different parameters.
+
+**Example 1: Input Validation Methods**
+
+[Show InputValidator.java]
+
+In InputValidator, I have several overloaded methods for validation:
+
+- `getValidatedCustomer()` at line 133 - no parameters, uses default error message
+- `getValidatedCustomer(String errorMessage)` at line 138 - accepts custom error message
+
+Similarly for accounts:
+- `getValidatedAccount()` at line 150 - no parameters
+- `getValidatedAccount(String errorMessage)` at line 156 - custom error message
+- `getValidatedAccountWithLabel(String label, String errorMessage)` at line 173 - custom prompt label AND error message
+
+Same method name, different parameter lists. The compiler determines which version to call based on the arguments you provide. This is compile-time polymorphism.
+
+**Example 2: UI Formatting Methods**
+
+[Show UIFormatter.java]
+
+In UIFormatter, I have overloaded error display methods:
+
+- `printError(String message)` at line 181 - simple error with just a message
+- `printErrorEnhanced(String message, String suggestion)` at line 381 - enhanced error with a suggestion box
+
+Same concept for success messages:
+- `printSuccess(String message, String... details)` at line 159 - basic success message with optional details
+- `printSuccessEnhanced(String message, String... details)` at line 349 - enhanced success in a styled box
+
+The method name is the same, but the parameter list determines which version executes.
+
+#### Why This Matters
+
+Method overriding provides **runtime flexibility** - the behavior changes based on the actual object type at runtime. Method overloading provides **API convenience** - one method name handles multiple scenarios with different parameters.
+
+I'll demonstrate the withdraw() overriding live in the demo - you'll see the same method call produce different results for SavingsAccount versus CheckingAccount when funds are insufficient."
 
 ### 2.5 Relationships (45 seconds)
 

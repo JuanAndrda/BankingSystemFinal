@@ -1,6 +1,7 @@
 package com.banking.auth;
 
 import java.util.LinkedList;
+import com.banking.utilities.ValidationPatterns;
 
 // Customer user account with access to own accounts only
 public class UserAccount extends User {
@@ -13,9 +14,8 @@ public class UserAccount extends User {
 
     // Validate linked customer ID
     private String validateLinkedCustomerId(String linkedCustomerId) {
-        if (!com.banking.utilities.ValidationPatterns.matchesPattern(linkedCustomerId,
-                com.banking.utilities.ValidationPatterns.CUSTOMER_ID_PATTERN)) {
-            throw new IllegalArgumentException(com.banking.utilities.ValidationPatterns.CUSTOMER_ID_ERROR);
+        if (!ValidationPatterns.matchesPattern(linkedCustomerId, ValidationPatterns.CUSTOMER_ID_PATTERN)) {
+            throw new IllegalArgumentException(ValidationPatterns.CUSTOMER_ID_ERROR);
         }
         return linkedCustomerId;
     }

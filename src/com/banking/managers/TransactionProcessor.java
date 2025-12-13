@@ -27,8 +27,7 @@ public class TransactionProcessor {
         }
 
         try {
-            Transaction tx = new Transaction("TX" + String.format("%03d", this.txCounter++),
-                    TransactionType.DEPOSIT, amount);
+            Transaction tx = new Transaction("TX" + String.format("%03d", this.txCounter++), TransactionType.DEPOSIT, amount);
             tx.setToAccountNo(accountNo);
 
             account.deposit(amount);
@@ -50,8 +49,7 @@ public class TransactionProcessor {
         }
 
         try {
-            Transaction tx = new Transaction("TX" + String.format("%03d", this.txCounter++),
-                    TransactionType.WITHDRAW, amount);
+            Transaction tx = new Transaction("TX" + String.format("%03d", this.txCounter++), TransactionType.WITHDRAW, amount);
             tx.setFromAccountNo(accountNo);
 
             if (account.withdraw(amount)) {
@@ -81,8 +79,7 @@ public class TransactionProcessor {
         }
 
         try {
-            Transaction tx = new Transaction("TX" + String.format("%03d", this.txCounter++),
-                    TransactionType.TRANSFER, amount);
+            Transaction tx = new Transaction("TX" + String.format("%03d", this.txCounter++), TransactionType.TRANSFER, amount);
             tx.setFromAccountNo(fromAccountNo);
             tx.setToAccountNo(toAccountNo);
 
@@ -124,19 +121,14 @@ public class TransactionProcessor {
         UIFormatter.printSectionHeader("DEPOSIT MONEY");
 
         while (true) {  // OUTER RETRY LOOP
-            Account account = this.validator.getValidatedAccountWithLabel(
-                    "Account to deposit to:",
-                    "✗ Account not found. Cannot deposit to non-existent account.");
+            Account account = this.validator.getValidatedAccount("Account to deposit to:", "✗ Account not found. Cannot deposit to non-existent account.");
             if (account == null) return;  // User cancelled - exit immediately
 
             if (!this.bankingSystem.canAccessAccount(account.getAccountNo())) {
-                UIFormatter.printErrorEnhanced(
-                    "Access denied. You can only perform transactions on your own accounts.",
-                    "Please select one of your accounts from the list above."
+                UIFormatter.printErrorEnhanced("Access denied. You can only perform transactions on your own accounts.", "Please select one of your accounts from the list above."
                 );
                 // Log access denial for audit trail
-                this.bankingSystem.logAction("ACCESS_DENIED",
-                    "Attempted to deposit to account: " + account.getAccountNo());
+                this.bankingSystem.logAction("ACCESS_DENIED", "Attempted to deposit to account: " + account.getAccountNo());
 
                 if (!this.validator.confirmAction("Try again with a different account?")) {
                     return;  // User chose no - exit
@@ -149,11 +141,7 @@ public class TransactionProcessor {
 
             boolean success = this.deposit(account.getAccountNo(), depAmt);
             if (success) {
-                UIFormatter.printSuccessEnhanced(
-                    "Deposit successful!",
-                    "Amount: $" + String.format("%.2f", depAmt),
-                    "Account: " + account.getAccountNo(),
-                    "New Balance: $" + String.format("%.2f", account.getBalance())
+                UIFormatter.printSuccessEnhanced("Deposit successful!", "Amount: $" + String.format("%.2f", depAmt), "Account: " + account.getAccountNo(), "New Balance: $" + String.format("%.2f", account.getBalance())
                 );
                 InputValidator.safeLogAction(bankingSystem, "DEPOSIT", "Amount: $" + depAmt + " to account: " + account.getAccountNo());
                 break;  // Success - exit loop
@@ -172,19 +160,14 @@ public class TransactionProcessor {
         UIFormatter.printSectionHeader("WITHDRAW MONEY");
 
         while (true) {  // OUTER RETRY LOOP
-            Account account = this.validator.getValidatedAccountWithLabel(
-                    "Account to withdraw from:",
-                    "✗ Account not found. Cannot withdraw from non-existent account.");
+            Account account = this.validator.getValidatedAccount("Account to withdraw from:", "✗ Account not found. Cannot withdraw from non-existent account.");
             if (account == null) return;  // User cancelled - exit immediately
 
             if (!this.bankingSystem.canAccessAccount(account.getAccountNo())) {
-                UIFormatter.printErrorEnhanced(
-                    "Access denied. You can only perform transactions on your own accounts.",
-                    "Please select one of your accounts from the list above."
+                UIFormatter.printErrorEnhanced("Access denied. You can only perform transactions on your own accounts.", "Please select one of your accounts from the list above."
                 );
                 // Log access denial for audit trail
-                this.bankingSystem.logAction("ACCESS_DENIED",
-                    "Attempted to withdraw from account: " + account.getAccountNo());
+                this.bankingSystem.logAction("ACCESS_DENIED", "Attempted to withdraw from account: " + account.getAccountNo());
 
                 if (!this.validator.confirmAction("Try again with a different account?")) {
                     return;  // User chose no - exit
@@ -197,11 +180,7 @@ public class TransactionProcessor {
 
             boolean success = this.withdraw(account.getAccountNo(), witAmt);
             if (success) {
-                UIFormatter.printSuccessEnhanced(
-                    "Withdrawal successful!",
-                    "Amount: $" + String.format("%.2f", witAmt),
-                    "Account: " + account.getAccountNo(),
-                    "New Balance: $" + String.format("%.2f", account.getBalance())
+                UIFormatter.printSuccessEnhanced("Withdrawal successful!", "Amount: $" + String.format("%.2f", witAmt), "Account: " + account.getAccountNo(), "New Balance: $" + String.format("%.2f", account.getBalance())
                 );
                 InputValidator.safeLogAction(bankingSystem, "WITHDRAW", "Amount: $" + witAmt + " from account: " + account.getAccountNo());
                 break;  // Success - exit loop
@@ -220,15 +199,11 @@ public class TransactionProcessor {
         UIFormatter.printSectionHeader("TRANSFER MONEY");
 
         while (true) {  // OUTER RETRY LOOP
-            Account fromAccount = this.validator.getValidatedAccountWithLabel(
-                    "Source account (to transfer FROM):",
-                    "✗ Source account not found. Cannot transfer from non-existent account.");
+            Account fromAccount = this.validator.getValidatedAccount("Source account (to transfer FROM):", "✗ Source account not found. Cannot transfer from non-existent account.");
             if (fromAccount == null) return;  // User cancelled - exit immediately
 
             if (!this.bankingSystem.canAccessAccount(fromAccount.getAccountNo())) {
-                UIFormatter.printErrorEnhanced(
-                    "Access denied. You can only transfer FROM your own accounts.",
-                    "Please select one of your accounts from the list above."
+                UIFormatter.printErrorEnhanced("Access denied. You can only transfer FROM your own accounts.", "Please select one of your accounts from the list above."
                 );
                 // Log access denial for audit trail
                 this.bankingSystem.logAction("ACCESS_DENIED",
@@ -240,9 +215,7 @@ public class TransactionProcessor {
                 continue;  // User chose yes - retry from top
             }
 
-            Account toAccount = this.validator.getValidatedAccountWithLabel(
-                    "Destination account (to transfer TO):",
-                    "✗ Destination account not found. Cannot transfer to non-existent account.");
+            Account toAccount = this.validator.getValidatedAccount("Destination account (to transfer TO):", "✗ Destination account not found. Cannot transfer to non-existent account.");
             if (toAccount == null) return;  // User cancelled - exit immediately
 
             if (fromAccount.getAccountNo().equals(toAccount.getAccountNo())) {
@@ -259,12 +232,7 @@ public class TransactionProcessor {
 
             boolean success = this.transfer(fromAccount.getAccountNo(), toAccount.getAccountNo(), amt);
             if (success) {
-                UIFormatter.printSuccessEnhanced(
-                    "Transfer successful!",
-                    "Amount: $" + String.format("%.2f", amt),
-                    "From: " + fromAccount.getAccountNo(),
-                    "To: " + toAccount.getAccountNo(),
-                    "New Balance (From): $" + String.format("%.2f", fromAccount.getBalance())
+                UIFormatter.printSuccessEnhanced("Transfer successful!", "Amount: $" + String.format("%.2f", amt), "From: " + fromAccount.getAccountNo(), "To: " + toAccount.getAccountNo(), "New Balance (From): $" + String.format("%.2f", fromAccount.getBalance())
                 );
                 InputValidator.safeLogAction(bankingSystem, "TRANSFER", "Amount: $" + amt + " from " + fromAccount.getAccountNo() + " to " + toAccount.getAccountNo());
                 break;  // Success - exit loop
@@ -290,13 +258,10 @@ public class TransactionProcessor {
 
         // Defense in depth - secondary access control check
         if (!this.bankingSystem.canAccessAccount(account.getAccountNo())) {
-            UIFormatter.printErrorEnhanced(
-                "Access denied. You can only view transaction history for your own accounts.",
-                "Please select one of your accounts from the list above."
+            UIFormatter.printErrorEnhanced("Access denied. You can only view transaction history for your own accounts.", "Please select one of your accounts from the list above."
             );
             // Log access denial for audit trail
-            this.bankingSystem.logAction("ACCESS_DENIED",
-                "Attempted to view transaction history for account: " + account.getAccountNo());
+            this.bankingSystem.logAction("ACCESS_DENIED", "Attempted to view transaction history for account: " + account.getAccountNo());
             return;
         }
 

@@ -21,8 +21,6 @@ package com.banking.utilities;
  * - Info marker: → (arrow)
  * - Bullet: • (bullet point)
  *
- * @author Banking System Team
- * @version 2.0
  */
 public class UIFormatter {
 

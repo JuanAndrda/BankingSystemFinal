@@ -6,12 +6,6 @@ import java.util.List;
 
 /**
  * Helper class to group MenuActions by category.
- * Replaces LinkedHashMap<MenuCategory, List<MenuAction>> pattern.
- *
- * Data Structure: Simple wrapper class using ArrayList
- * - Demonstrates: Composition, encapsulation
- * - Uses only ArrayList (already covered)
- *
  * This class encapsulates a MenuCategory and its associated MenuActions.
  * It provides a cleaner alternative to using HashMap for grouping operations.
  *
