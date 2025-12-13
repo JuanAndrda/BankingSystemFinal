@@ -141,7 +141,7 @@ public class BankingSystem {
         boolean running = true;
 
         System.out.println("\n╔════════════════════════════════════╗");
-        System.out.println("║   BANKING MANAGEMENT SYSTEM v2.0   ║");
+        System.out.println("║   BANKING MANAGEMENT SYSTEM       ║");
         System.out.println("╚════════════════════════════════════╝\n");
 
         while (running) {
@@ -172,7 +172,7 @@ public class BankingSystem {
                 }
 
                 // SINGLE PERMISSION CHECK (no repeated checks in switch!)
-                if (!action.canAccess(this.currentUser.getUserRole())) {
+                if (!action.canAccess(this.currentUser.getUserRole())) { //check if no needed doudle validation
                     System.out.println("\n✗ Option not available for your role.");
                     continue;
                 }
@@ -183,49 +183,24 @@ public class BankingSystem {
                 switch (action) {
                     // ===== CUSTOMER OPERATIONS (Admin Only) =====
                     case CREATE_CUSTOMER:
-                        if (this.hasPermission("CREATE_CUSTOMER")) {
-                            this.customerMgr.handleCreateCustomer();
-                        } else {
-                            System.out.println("✗ You do not have permission to create customers.");
-                            this.logAction("CREATE_CUSTOMER_DENIED", "User attempted to create customer without permission");
-                        }
+                        this.customerMgr.handleCreateCustomer();
                         break;
 
                     case VIEW_CUSTOMER_DETAILS:
-                        if (this.hasPermission("VIEW_CUSTOMER_DETAILS")) {
-                            this.customerMgr.handleViewCustomerDetails();
-                        } else {
-                            System.out.println("✗ You do not have permission to view customer details.");
-                            this.logAction("VIEW_CUSTOMER_DETAILS_DENIED", "User attempted to view customer details without permission");
-                        }
+                        this.customerMgr.handleViewCustomerDetails();
                         break;
 
                     case VIEW_ALL_CUSTOMERS:
-                        if (this.hasPermission("VIEW_ALL_CUSTOMERS")) {
-                            this.customerMgr.handleViewAllCustomers();
-                        } else {
-                            System.out.println("✗ You do not have permission to view all customers.");
-                            this.logAction("VIEW_ALL_CUSTOMERS_DENIED", "User attempted to view all customers without permission");
-                        }
+                        this.customerMgr.handleViewAllCustomers();
                         break;
 
                     case DELETE_CUSTOMER:
-                        if (this.hasPermission("DELETE_CUSTOMER")) {
-                            this.customerMgr.handleDeleteCustomer();
-                        } else {
-                            System.out.println("✗ You do not have permission to delete customers.");
-                            this.logAction("DELETE_CUSTOMER_DENIED", "User attempted to delete customer without permission");
-                        }
+                        this.customerMgr.handleDeleteCustomer();
                         break;
 
                     // ===== ACCOUNT OPERATIONS =====
                     case CREATE_ACCOUNT:
-                        if (this.hasPermission("CREATE_ACCOUNT")) {
-                            this.accountMgr.handleCreateAccount();
-                        } else {
-                            System.out.println("✗ You do not have permission to create accounts.");
-                            this.logAction("CREATE_ACCOUNT_DENIED", "User attempted to create account without permission");
-                        }
+                        this.accountMgr.handleCreateAccount();
                         break;
 
                     case VIEW_ACCOUNT_DETAILS:
@@ -240,30 +215,15 @@ public class BankingSystem {
                         break;
 
                     case VIEW_ALL_ACCOUNTS:
-                        if (this.hasPermission("VIEW_ALL_ACCOUNTS")) {
-                            this.accountMgr.handleViewAllAccounts();
-                        } else {
-                            System.out.println("✗ You do not have permission to view all accounts.");
-                            this.logAction("VIEW_ALL_ACCOUNTS_DENIED", "User attempted to view all accounts without permission");
-                        }
+                        this.accountMgr.handleViewAllAccounts();
                         break;
 
                     case DELETE_ACCOUNT:
-                        if (this.hasPermission("DELETE_ACCOUNT")) {
-                            this.accountMgr.handleDeleteAccount();
-                        } else {
-                            System.out.println("✗ You do not have permission to delete accounts.");
-                            this.logAction("DELETE_ACCOUNT_DENIED", "User attempted to delete account without permission");
-                        }
+                        this.accountMgr.handleDeleteAccount();
                         break;
 
                     case UPDATE_OVERDRAFT_LIMIT:
-                        if (this.hasPermission("UPDATE_OVERDRAFT_LIMIT")) {
-                            this.accountMgr.handleUpdateOverdraftLimit();
-                        } else {
-                            System.out.println("✗ You do not have permission to update overdraft limits.");
-                            this.logAction("UPDATE_OVERDRAFT_LIMIT_DENIED", "User attempted to update overdraft limit without permission");
-                        }
+                        this.accountMgr.handleUpdateOverdraftLimit();
                         break;
 
                     // ===== TRANSACTION OPERATIONS (Both Roles) =====
@@ -310,49 +270,24 @@ public class BankingSystem {
 
                     // ===== PROFILE OPERATIONS (Admin Only) =====
                     case CREATE_CUSTOMER_PROFILE:
-                        if (this.hasPermission("CREATE_CUSTOMER_PROFILE")) {
-                            this.customerMgr.handleCreateCustomerProfile();
-                        } else {
-                            System.out.println("✗ You do not have permission to create customer profiles.");
-                            this.logAction("CREATE_CUSTOMER_PROFILE_DENIED", "User attempted to create customer profile without permission");
-                        }
+                        this.customerMgr.handleCreateCustomerProfile();
                         break;
 
                     case UPDATE_PROFILE_INFORMATION:
-                        if (this.hasPermission("UPDATE_PROFILE_INFORMATION")) {
-                            this.customerMgr.handleUpdateCustomerProfile();
-                        } else {
-                            System.out.println("✗ You do not have permission to update profile information.");
-                            this.logAction("UPDATE_PROFILE_INFORMATION_DENIED", "User attempted to update profile without permission");
-                        }
+                        this.customerMgr.handleUpdateCustomerProfile();
                         break;
 
                     // ===== REPORTS & UTILITIES (Admin Only) =====
                     case APPLY_INTEREST:
-                        if (this.hasPermission("APPLY_INTEREST")) {
-                            this.accountMgr.handleApplyInterest();
-                        } else {
-                            System.out.println("✗ You do not have permission to apply interest.");
-                            this.logAction("APPLY_INTEREST_DENIED", "User attempted to apply interest without permission");
-                        }
+                        this.accountMgr.handleApplyInterest();
                         break;
 
                     case SORT_ACCOUNTS_BY_NAME:
-                        if (this.hasPermission("SORT_ACCOUNTS_BY_NAME")) {
-                            this.accountMgr.handleSortByName();
-                        } else {
-                            System.out.println("✗ You do not have permission to sort accounts.");
-                            this.logAction("SORT_ACCOUNTS_BY_NAME_DENIED", "User attempted to sort accounts by name without permission");
-                        }
+                        this.accountMgr.handleSortByName();
                         break;
 
                     case SORT_ACCOUNTS_BY_BALANCE:
-                        if (this.hasPermission("SORT_ACCOUNTS_BY_BALANCE")) {
-                            this.accountMgr.handleSortByBalance();
-                        } else {
-                            System.out.println("✗ You do not have permission to sort accounts.");
-                            this.logAction("SORT_ACCOUNTS_BY_BALANCE_DENIED", "User attempted to sort accounts by balance without permission");
-                        }
+                        this.accountMgr.handleSortByBalance();
                         break;
 
                     case VIEW_AUDIT_TRAIL:

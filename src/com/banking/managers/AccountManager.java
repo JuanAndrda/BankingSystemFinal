@@ -51,11 +51,8 @@ public class AccountManager {
             return null;
         }
 
-        // Calls this.validateAccountExists() to prevent duplicates
-        if (this.validateAccountExists(accountNo)) {
-            UIFormatter.printError("Account number already exists: " + accountNo);
-            return null;
-        }
+        // Note: Duplicate validation removed - auto-generation (maxId + 1) guarantees uniqueness
+        // If manual account numbers are ever supported, add validation here
 
         try {
             Account account = null;
@@ -104,7 +101,7 @@ public class AccountManager {
                     "Balance: $0.00");
 
             // Log the action
-            if (this.bankingSystem != null && this.bankingSystem.getCurrentUser() != null) {
+            if (this.bankingSystem.getCurrentUser() != null) {
                 this.bankingSystem.logAction("CREATE_ACCOUNT",
                         "Account: " + accountNo + " Type: " + accountType + " Customer: " + customer.getCustomerId());
             }

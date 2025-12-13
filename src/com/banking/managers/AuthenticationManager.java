@@ -182,7 +182,7 @@ public class AuthenticationManager {
         Random random = new Random();
         int randomNum = 1000 + random.nextInt(9000);
 
-        return "Welcome" + firstTwo + randomNum;
+        return firstTwo + randomNum;
     }
 
 

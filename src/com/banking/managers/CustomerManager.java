@@ -73,11 +73,8 @@ public class CustomerManager {
 
 
     public Customer createCustomer(String customerId, String name) {
-        // Check for duplicate customer ID
-        if (this.validateCustomerExists(customerId)) {
-            UIFormatter.printError("Customer ID already exists: " + customerId);
-            return null;
-        }
+        // Note: Duplicate validation removed - auto-generation (maxId + 1) guarantees uniqueness
+        // If manual IDs are ever supported, add validation here
 
         try {
             Customer c = new Customer(customerId, name);
@@ -303,18 +300,14 @@ public class CustomerManager {
         // Step 4: Get AuthenticationManager for username/password generation
         // Calls BankingSystem.getAuthenticationManager()
         AuthenticationManager authManager = this.bankingSystem.getAuthenticationManager();
-        if (authManager == null) {
-            UIFormatter.printError("Authentication system not available");
-            return;
-        }
 
         // Step 5: Auto-generate username and password
         // Calls AuthenticationManager.generateUsername() - converts "John Doe" to "john_doe"
         String username = authManager.generateUsername(custName);
-        // Calls AuthenticationManager.generateTemporaryPassword() - format: "Welcomexx####"
+        // Calls AuthenticationManager.generateTemporaryPassword() - format: "xx####"
         String tempPassword = authManager.generateTemporaryPassword(username);
 
-        // Step 6: Create UserAccount (linked to this customer)
+        // Step 6: Link UserAccount (linked to this customer)
         // Calls BankingSystem.registerUser() to add to user registry
         UserAccount userAccount = new UserAccount(username, tempPassword, custId);
         if (!this.bankingSystem.registerUser(userAccount)) {
@@ -608,13 +601,8 @@ public class CustomerManager {
 
         // Create account using unified helper (auto-generates number, displays result, logs action)
         try {
-            if (this.accountMgr != null) {
-                Account createdAccount = this.accountMgr.createAndDisplayAccount(customer, accountType);
-                return createdAccount != null;
-            } else {
-                UIFormatter.printError("Account manager not available.");
-                return false;
-            }
+            Account createdAccount = this.accountMgr.createAndDisplayAccount(customer, accountType);
+            return createdAccount != null;
         } catch (Exception e) {
             UIFormatter.printError("Error creating account: " + e.getMessage());
             return false;
