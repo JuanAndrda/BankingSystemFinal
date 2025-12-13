@@ -43,7 +43,10 @@ public class AuthenticationManager {
         }
 
         userRegistry.add(user);
-        logAction(null, user.getUserRole(), "USER_REGISTERED", "Username: " + user.getUsername());
+        // Log with the new user's username, include who registered them
+        String registeredBy = (currentUser != null) ? currentUser.getUsername() : "SYSTEM";
+        logAction(user.getUsername(), user.getUserRole(), "USER_REGISTERED",
+                 "Registered by: " + registeredBy);
         return true;
     }
 
@@ -85,7 +88,9 @@ public class AuthenticationManager {
                 // Generic error message for security (doesn't reveal if username or password was wrong)
                 loginAttempts++;
                 System.out.println("✗ Invalid credentials. Attempt " + loginAttempts + "/" + maxAttempts);
-                logAction(null, null, "LOGIN_FAILED", "Invalid credentials for: " + username);
+                // Log failed attempt with the attempted username (role unknown for security)
+                logAction(username, null, "LOGIN_FAILED",
+                         "Failed attempt " + loginAttempts + "/" + maxAttempts);
             }
         }
 
@@ -109,7 +114,7 @@ public class AuthenticationManager {
 
 
     public void logAction(String username, UserRole userRole, String action, String details) {
-        // Only log if we have valid info
+        // Only log if we have valid action
         if (action == null) return;
 
         // If no username provided, use current user if available
@@ -118,6 +123,12 @@ public class AuthenticationManager {
             if (userRole == null) {
                 userRole = currentUser.getUserRole();
             }
+        }
+
+        // For security events (LOGIN_FAILED), we may not know the role
+        // Use ADMIN as placeholder for unknown role in security events
+        if (username != null && userRole == null && action.equals("LOGIN_FAILED")) {
+            userRole = UserRole.ADMIN;  // Placeholder for security logs
         }
 
         // Only add to audit trail if we have username and role
