@@ -50,7 +50,7 @@ public class CustomerProfile {
 
     // ===== SETTERS WITH VALIDATION =====
     public void setProfileId(String profileId) {
-        if (ValidationPatterns.matchesPattern(profileId, ValidationPatterns.PROFILE_ID_PATTERN)) {
+        if (!ValidationPatterns.matchesPattern(profileId, ValidationPatterns.PROFILE_ID_PATTERN)) {
             throw new IllegalArgumentException(ValidationPatterns.PROFILE_ID_ERROR);
         }
         this.profileId = profileId;

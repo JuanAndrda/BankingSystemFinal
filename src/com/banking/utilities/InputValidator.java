@@ -342,7 +342,6 @@ public class InputValidator {
                 UIFormatter.printError("Invalid input. Please enter 'yes' or 'no'.");
                 System.out.println("   Please try again...\n");
                 System.out.print("→ Your choice (yes/no): ");  // Re-prompt
-                continue;
             }
         }
     }
