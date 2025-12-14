@@ -225,12 +225,6 @@ public class InputValidator {
 
     // Get validated account with access control
     public Account getValidatedAccountWithAccessControl(User currentUser) {
-        // Check if user is null (no one logged in)
-        if (currentUser == null) {
-            System.out.println("✗ No user logged in");
-            return null;
-        }
-
         // If user is admin, allow any account input
         if (currentUser.getUserRole() == UserRole.ADMIN) {
             return this.getValidatedAccount("✗ Account not found");

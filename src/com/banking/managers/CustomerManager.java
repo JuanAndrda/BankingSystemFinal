@@ -73,9 +73,6 @@ public class CustomerManager {
 
 
     public Customer createCustomer(String customerId, String name) {
-        // Note: Duplicate validation removed - auto-generation (maxId + 1) guarantees uniqueness
-        // If manual IDs are ever supported, add validation here
-
         try {
             Customer c = new Customer(customerId, name);
             this.customers.add(c);
@@ -353,8 +350,7 @@ public class CustomerManager {
     public void handleViewCustomerDetails() {
         UIFormatter.printSectionHeader("VIEW CUSTOMER DETAILS");
 
-        Customer customer = this.validator.getValidatedCustomer(
-                "✗ Customer not found. Please check the Customer ID.");
+        Customer customer = this.validator.getValidatedCustomer("✗ Customer not found. Please check the Customer ID.");
         if (customer == null) return;
 
         // Professional box format for customer details

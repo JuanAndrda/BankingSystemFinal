@@ -185,11 +185,6 @@ public class AuthenticationManager {
 
 
     public User changePassword(String username, String oldPassword, String newPassword) {
-        // Step 1: Validate inputs
-        if (username == null || oldPassword == null || newPassword == null) {
-            System.out.println("✗ Username and passwords cannot be null");
-            return null;
-        }
 
         // Step 2: Find the user
         User currentUser = null;
@@ -281,12 +276,6 @@ public class AuthenticationManager {
      */
     public User handleChangePassword() {
         System.out.println("\n--- CHANGE PASSWORD ---");
-
-        // Get current user
-        if (this.currentUser == null) {
-            System.out.println("✗ No user logged in");
-            return null;
-        }
 
         String username = this.currentUser.getUsername();
 

@@ -46,14 +46,8 @@ public class AccountManager {
     public Account createAccount(String customerId, String accountType, String accountNo) {
         // Calls this.findCustomer() to search LinkedList
         Customer customer = this.findCustomer(customerId);
-        if (customer == null) {
-            UIFormatter.printError("Customer not found: " + customerId);
-            return null;
-        }
-
         // Note: Duplicate validation removed - auto-generation (maxId + 1) guarantees uniqueness
         // If manual account numbers are ever supported, add validation here
-
         try {
             Account account = null;
             if (accountType.equalsIgnoreCase("SAVINGS")) {
@@ -104,13 +98,8 @@ public class AccountManager {
 
     public boolean deleteAccount(String accountNo) {
         Account account = this.findAccount(accountNo);
-        if (account == null) {
-            UIFormatter.printError("Account not found: " + accountNo);
-            return false;
-        }
 
-        this.accountList.remove
-                (account);
+        this.accountList.remove(account);
         Customer owner = account.getOwner();
         owner.removeAccount(accountNo);
         UIFormatter.printSuccess("Account deleted: " + accountNo);
@@ -127,15 +116,13 @@ public class AccountManager {
         for (int i = 1; i < accountList.size(); i++) {
             // Get current account to insert into sorted portion
             Account currentAccount = accountList.get(i);
-            String currentName = (currentAccount.getOwner() != null)
-                    ? currentAccount.getOwner().getName() : "";
+            String currentName = (currentAccount.getOwner() != null) ? currentAccount.getOwner().getName() : "";
             // Find the correct position to insert currentAccount in sorted portion
             int j = i - 1;
 
             while (j >= 0) {
                 Account compareAccount = accountList.get(j);
-                String compareName = (compareAccount.getOwner() != null)
-                        ? compareAccount.getOwner().getName() : "";
+                String compareName = (compareAccount.getOwner() != null) ? compareAccount.getOwner().getName() : "";
 
                 // If current name comes before compare name alphabetically, shift right
                 if (currentName.compareToIgnoreCase(compareName) < 0) {
@@ -282,10 +269,6 @@ public class AccountManager {
 
     public boolean updateOverdraftLimit(String accountNo, double newLimit) {
         Account account = this.findAccount(accountNo);
-        if (account == null) {
-            UIFormatter.printError("Account not found");
-            return false;
-        }
 
         if (!(account instanceof CheckingAccount)) {
             UIFormatter.printError("This is not a checking account. Only checking accounts have overdraft limits.");
@@ -309,8 +292,7 @@ public class AccountManager {
         // Unified retry loop: handles BOTH "not found" AND "wrong type"
         Account account = null;
         while (account == null) {
-            String accNo = this.validator.getValidatedInput("Account Number (Checking account only):", ValidationPatterns.ACCOUNT_NO_PATTERN,
-                    "(format: " + com.banking.utilities.ValidationPatterns.ACCOUNT_NO_FORMAT + " e.g., ACC001)");
+            String accNo = this.validator.getValidatedInput("Account Number (Checking account only):", ValidationPatterns.ACCOUNT_NO_PATTERN, "(format: " + ValidationPatterns.ACCOUNT_NO_FORMAT + " e.g., ACC001)");
             if (accNo == null) return;  // User cancelled
 
             Account candidate = this.findAccount(accNo);
