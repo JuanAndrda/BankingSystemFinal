@@ -67,9 +67,6 @@ public class AccountManager {
                 return null;
             }
 
-            // Note: No null check needed here - 'new' operator cannot return null
-            // If validation fails, constructor throws IllegalArgumentException (caught below)
-
             // Add to system LinkedList
             this.accountList.add(account);
             // Calls Customer.addAccount() to establish bidirectional relationship
@@ -112,13 +109,10 @@ public class AccountManager {
             return false;
         }
 
-        this.accountList.remove(account);
+        this.accountList.remove
+                (account);
         Customer owner = account.getOwner();
-        if (owner != null) {
-            owner.removeAccount(accountNo);
-        } else {
-            System.out.println("⚠ Warning: Account had no owner, only removed from system");
-        }
+        owner.removeAccount(accountNo);
         UIFormatter.printSuccess("Account deleted: " + accountNo);
         return true;
     }
@@ -441,7 +435,7 @@ public class AccountManager {
             UIFormatter.printLeftAlignedLine("  Available Credit:   $" + String.format("%.2f", checking.getBalance() + checking.getOverdraftLimit()), 0);
         }
 
-        LinkedList<Transaction> txHistory = account.getTransactionHistory();
+        Stack<Transaction> txHistory = account.getTransactionHistory();
         UIFormatter.printLeftAlignedLine("  Total Transactions: " + (txHistory != null ? txHistory.size() : 0), 0);
 
         UIFormatter.printBottomBorder();

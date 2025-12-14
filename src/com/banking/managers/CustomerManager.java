@@ -120,6 +120,12 @@ public class CustomerManager {
             System.out.println("⚠ Warning: Not all accounts were successfully deleted");
         }
 
+        // Delete associated UserAccount from userRegistry (cascade delete)
+        boolean userDeleted = this.bankingSystem.getAuthenticationManager().deleteUserByCustomerId(customerId);
+        if (!userDeleted) {
+            System.out.println("⚠ Warning: No user account found for customer " + customerId);
+        }
+
         // Remove customer from LinkedList
         this.customers.remove(customer);
         UIFormatter.printSuccess("Customer deleted: " + customerId);

@@ -102,20 +102,6 @@ public class TransactionProcessor {
         }
     }
 
-    // Uses Stack to show most recent transactions first (LIFO)
-    public Stack<Transaction> getAccountTransactionsAsStack(String accountNo) {
-        Account acc = AccountUtils.findAccount(this.accountList, accountNo);
-        if (acc == null) return new Stack<>();
-
-        Stack<Transaction> txStack = new Stack<>();
-        LinkedList<Transaction> history = acc.getTransactionHistory();
-
-        for (Transaction tx : history) {
-            txStack.push(tx);
-        }
-
-        return txStack;
-    }
 
     public void handleDeposit() {
         UIFormatter.printSectionHeader("DEPOSIT MONEY");
@@ -251,21 +237,18 @@ public class TransactionProcessor {
         UIFormatter.printSectionHeader("VIEW TRANSACTION HISTORY");
 
         // FIX: Use access-controlled validator instead of regular getValidatedAccount()
-        Account account = this.validator.getValidatedAccountWithAccessControl(
-            this.bankingSystem.getCurrentUser()
+        Account account = this.validator.getValidatedAccountWithAccessControl(this.bankingSystem.getCurrentUser()
         );
         if (account == null) return;
 
         // Defense in depth - secondary access control check
-        if (!this.bankingSystem.canAccessAccount(account.getAccountNo())) {
-            UIFormatter.printErrorEnhanced("Access denied. You can only view transaction history for your own accounts.", "Please select one of your accounts from the list above."
-            );
+        if (!this.bankingSystem.canAccessAccount(account.getAccountNo())) {UIFormatter.printErrorEnhanced("Access denied. You can only view transaction history for your own accounts.", "Please select one of your accounts from the list above.");
             // Log access denial for audit trail
             this.bankingSystem.logAction("ACCESS_DENIED", "Attempted to view transaction history for account: " + account.getAccountNo());
             return;
         }
 
-        Stack<Transaction> txStack = this.getAccountTransactionsAsStack(account.getAccountNo());
+        Stack<Transaction> txStack = account.getTransactionHistory();
 
         if (txStack.isEmpty()) {
             UIFormatter.printInfo("No transactions yet. This is normal for new accounts.");
@@ -280,8 +263,10 @@ public class TransactionProcessor {
         // Professional table format - preserves LIFO Stack order
         UIFormatter.printTableHeader("TX ID", "Type", "Amount", "Status");
 
-        while (!txStack.isEmpty()) {
-            Transaction tx = txStack.pop();
+        Stack<Transaction> tempStack = (Stack<Transaction>) txStack.clone();
+
+        while (!tempStack.isEmpty()) {
+            Transaction tx = tempStack.pop();
             String txId = tx.getTxId();
             String type = tx.getType().toString();
             String amount = "$" + String.format("%.2f", tx.getAmount());

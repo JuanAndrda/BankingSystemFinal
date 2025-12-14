@@ -1,6 +1,6 @@
 package com.banking.models;
 
-import java.util.LinkedList;
+import java.util.Stack;
 import com.banking.utilities.ValidationPatterns;
 
 // Abstract base class - demonstrates ABSTRACTION and INHERITANCE
@@ -8,13 +8,13 @@ public abstract class Account {
     private String accountNo;
     private double balance;
     private Customer owner;
-    private LinkedList<Transaction> transactionHistory;
+    private Stack<Transaction> transactionHistory;
 
     public Account(String accountNo, Customer owner) {
         this.setAccountNo(accountNo);
         this.setOwner(owner);
         this.balance = 0.0;
-        this.transactionHistory = new LinkedList<>();
+        this.transactionHistory = new Stack<>();
     }
 
     public void deposit(double amount) {
@@ -42,14 +42,14 @@ public abstract class Account {
     }
 
     public void addTransaction(Transaction t) {
-        this.transactionHistory.add(t);
+        this.transactionHistory.push(t);
     }
 
     // Getters
     public String getAccountNo() { return this.accountNo; }
     public double getBalance() { return this.balance; }
     public Customer getOwner() { return this.owner; }
-    public LinkedList<Transaction> getTransactionHistory() { return this.transactionHistory; }
+    public Stack<Transaction> getTransactionHistory() { return this.transactionHistory; }
 
     // Setters with validation
     public void setAccountNo(String accountNo) {

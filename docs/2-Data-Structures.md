@@ -25,8 +25,8 @@ This Banking Management System uses **three different data structures** from the
 
 | Data Structure | Count | Primary Use Case | Time Complexity |
 |----------------|-------|------------------|-----------------|
-| **LinkedList** | 4 instances | Sequential access, frequent iteration | Add: O(1), Search: O(n) |
-| **Stack** | 2 instances | LIFO operations, reverse chronological display | Push/Pop: O(1) |
+| **LinkedList** | 3 instances | Sequential access, frequent iteration | Add: O(1), Search: O(n) |
+| **Stack** | 3 instances | LIFO operations, transaction history, audit logs | Push/Pop: O(1) |
 | **ArrayList** | 1 instance | Indexed access, dynamic sizing | Get: O(1), Add: O(1) amortized |
 
 ### Design Rationale
@@ -182,20 +182,29 @@ public class CustomerManager {
 
 **Add Customer - O(1)**
 
-**File:** `src/com/banking/managers/CustomerManager.java:85-95`
+**File:** `src/com/banking/managers/CustomerManager.java:74-88`
 
 ```java
-// Create customer object
-Customer customer = new Customer(customerId, name);
+public Customer createCustomer(String customerId, String name) {
+    if (customerId == null || name == null) {
+        UIFormatter.printError("Customer ID and name cannot be null");
+        return null;
+    }
 
-// Add to LinkedList - constant time
-customers.add(customer);
+    try {
+        // Create customer object
+        Customer c = new Customer(customerId, name);
 
-// Log creation
-bankingSystem.logAction("CREATE_CUSTOMER",
-    "Created customer: " + customerId + " - " + name);
+        // Add to LinkedList - constant time O(1)
+        this.customers.add(c);
 
-System.out.println("✓ Customer created successfully: " + customerId);
+        UIFormatter.printSuccess("Customer created: " + c);
+        return c;
+    } catch (IllegalArgumentException e) {
+        UIFormatter.printError("Error creating customer: " + e.getMessage());
+        return null;
+    }
+}
 ```
 
 **Search Customer - O(n)**
@@ -223,30 +232,41 @@ public Customer getValidatedCustomer(LinkedList<Customer> customers) {
 
 **Display All Customers - O(n)**
 
-**File:** `src/com/banking/managers/CustomerManager.java:300-330`
+**File:** `src/com/banking/managers/CustomerManager.java:391-422`
 
 ```java
 public void handleViewAllCustomers() {
-    if (customers.isEmpty()) {
-        System.out.println("No customers in the system.");
+    UIFormatter.printSectionHeader("VIEW ALL CUSTOMERS");
+
+    if (this.customers.isEmpty()) {
+        UIFormatter.printInfo("No customers found. Use option 1 (Create Customer) to add one.");
         return;
     }
 
-    System.out.println("\n=== ALL CUSTOMERS ===");
-    UIFormatter.printTableHeader("ID", "Name", "Profile");
+    System.out.println("\nTotal Customers: " + this.customers.size());
+    System.out.println();
+
+    // Professional table format
+    UIFormatter.printTableHeader("Customer ID", "Name", "Accounts", "Total Balance");
 
     // Iterate through LinkedList
-    for (Customer customer : customers) {
-        String profileStatus = customer.hasProfile() ? "Yes" : "No";
-        UIFormatter.printTableRow(
-            customer.getCustomerId(),
-            customer.getName(),
-            profileStatus
-        );
+    for (Customer customer : this.customers) {
+        String customerId = customer.getCustomerId();
+        String name = customer.getName();
+        String accountCount = String.valueOf(customer.getAccounts().size());
+
+        // Calculate total balance across all accounts
+        double totalBalance = 0.0;
+        for (Account acc : customer.getAccounts()) {
+            totalBalance += acc.getBalance();
+        }
+        String balance = "$" + String.format("%.2f", totalBalance);
+
+        UIFormatter.printTableRow(customerId, name, accountCount, balance);
     }
 
     UIFormatter.printTableFooter();
-    System.out.println("\nTotal customers: " + customers.size());
+    System.out.println();
 }
 ```
 
@@ -303,95 +323,39 @@ public class AccountManager {
 
 #### Operations
 
-**Find Accounts for Customer - O(n)**
+**Display All Accounts - O(n)**
 
-**File:** `src/com/banking/managers/AccountManager.java:500-520`
-
-```java
-public LinkedList<Account> getAccountsForCustomer(String customerId) {
-    LinkedList<Account> customerAccounts = new LinkedList<>();
-
-    // Iterate through all accounts - O(n)
-    for (Account account : accounts) {
-        if (account.getOwner().getCustomerId().equals(customerId)) {
-            customerAccounts.add(account);  // Collect matching accounts
-        }
-    }
-
-    return customerAccounts;
-}
-```
-
-**Polymorphic Display - O(n)**
-
-**File:** `src/com/banking/managers/AccountManager.java:400-430`
+**File:** `src/com/banking/managers/AccountManager.java:387-412`
 
 ```java
 public void handleViewAllAccounts() {
-    if (accounts.isEmpty()) {
-        System.out.println("No accounts in the system.");
+    UIFormatter.printSectionHeader("VIEW ALL ACCOUNTS");
+
+    if (this.accountList.isEmpty()) {
+        UIFormatter.printInfo("No accounts found. Use option 5 (Create Account) to add one.");
         return;
     }
 
-    System.out.println("\n=== ALL ACCOUNTS ===");
-    System.out.println("Total: " + accounts.size() + "\n");
+    System.out.println("\nTotal Accounts: " + this.accountList.size());
+    System.out.println();
 
-    // Iterate and display - polymorphic getDetails()
-    for (Account account : accounts) {
-        System.out.println(account.getDetails());
+    // Professional table format
+    UIFormatter.printTableHeader("Account No", "Type", "Owner", "Balance");
 
-        // Type-specific information
-        if (account instanceof SavingsAccount) {
-            SavingsAccount savings = (SavingsAccount) account;
-            System.out.println("  Interest Rate: " + (savings.getInterestRate() * 100) + "%");
-        } else if (account instanceof CheckingAccount) {
-            CheckingAccount checking = (CheckingAccount) account;
-            System.out.println("  Overdraft Limit: $" + checking.getOverdraftLimit());
-        }
-        System.out.println();
+    for (Account account : this.accountList) {
+        String accountNo = account.getAccountNo();
+        String type = (account instanceof SavingsAccount) ? "Savings" : "Checking";
+        String owner = (account.getOwner() != null) ? account.getOwner().getName() : "N/A";
+        String balance = "$" + String.format("%.2f", account.getBalance());
+
+        UIFormatter.printTableRow(accountNo, type, owner, balance);
     }
+
+    UIFormatter.printTableFooter();
+    System.out.println();
 }
 ```
 
----
-
-### Instance 4: Transaction Storage (Per Account)
-
-**Purpose:** Store transaction history for each account
-
-**File:** `src/com/banking/models/Account.java:18-20`
-
-```java
-public abstract class Account {
-    private String accountNo;
-    private double balance;
-    private Customer owner;  // Reference to owner Customer object
-    private LinkedList<Transaction> transactions;  // Transaction history
-
-    public Account(String accountNo, Customer owner, double initialBalance) {
-        // ...
-        this.transactions = new LinkedList<>();
-    }
-
-    public LinkedList<Transaction> getTransactions() {
-        return this.transactions;
-    }
-
-    public void addTransaction(Transaction transaction) {
-        if (transaction == null) {
-            throw new IllegalArgumentException("Transaction cannot be null");
-        }
-        this.transactions.add(transaction);  // O(1) append
-    }
-}
-```
-
-#### Why LinkedList?
-
-✅ **Append-only:** Transactions added to end (O(1))
-✅ **Chronological order:** Natural insertion order
-✅ **Conversion to Stack:** Easy to create LIFO view
-✅ **Full history:** Keep all transactions
 
 ---
 
@@ -513,43 +477,47 @@ Total operations logged: 5
 
 ---
 
-### Instance 2: Transaction History Display
+### Instance 2: Transaction History Storage (Per Account)
 
-**Purpose:** Display account transactions with newest first
+**Purpose:** Store transaction history for each account with LIFO access
 
-**File:** `src/com/banking/managers/TransactionProcessor.java:109-125`
+**File:** `src/com/banking/models/Account.java:11-17`
 
 ```java
-/**
- * Converts LinkedList of transactions to Stack for LIFO display.
- *
- * @param accountNo The account number
- * @return Stack with most recent transaction on top
- */
-public Stack<Transaction> getAccountTransactionsAsStack(String accountNo) {
-    Account account = findAccount(accountNo);
-    if (account == null) return new Stack<>();
+public abstract class Account {
+    private String accountNo;
+    private double balance;
+    private Customer owner;
+    private Stack<Transaction> transactionHistory;  // Transaction history
 
-    // Create stack from LinkedList
-    Stack<Transaction> txStack = new Stack<>();
-    for (Transaction tx : account.getTransactions()) {
-        txStack.push(tx);  // Build stack in order
+    public Account(String accountNo, Customer owner) {
+        this.setAccountNo(accountNo);
+        this.setOwner(owner);
+        this.balance = 0.0;
+        this.transactionHistory = new Stack<>();
     }
 
-    return txStack;  // Most recent is now on top
+    public Stack<Transaction> getTransactionHistory() {
+        return this.transactionHistory;
+    }
+
+    public void addTransaction(Transaction t) {
+        this.transactionHistory.push(t);  // O(1) push
+    }
 }
 ```
 
 #### Why Stack?
 
 ✅ **Better UX:** Users care about recent transactions first
-✅ **LIFO display:** Most recent transaction shown first
-✅ **Efficient pop:** O(1) to get each transaction
+✅ **Direct LIFO storage:** Most recent transaction always on top
+✅ **Efficient operations:** O(1) push and pop
 ✅ **Natural fit:** Transaction history is inherently chronological
+✅ **No conversion needed:** Stack used directly for storage and display
 
 #### Display Implementation
 
-**File:** `src/com/banking/managers/TransactionProcessor.java:282-329`
+**File:** `src/com/banking/managers/TransactionProcessor.java:236-285`
 
 ```java
 public void handleViewTransactionHistory() {
@@ -561,8 +529,8 @@ public void handleViewTransactionHistory() {
     );
     if (account == null) return;
 
-    // Convert to Stack for LIFO display
-    Stack<Transaction> txStack = this.getAccountTransactionsAsStack(account.getAccountNo());
+    // Get Stack directly from account - no conversion needed
+    Stack<Transaction> txStack = account.getTransactionHistory();
 
     if (txStack.isEmpty()) {
         UIFormatter.printInfo("No transactions yet. This is normal for new accounts.");
@@ -577,9 +545,13 @@ public void handleViewTransactionHistory() {
     // Professional table format
     UIFormatter.printTableHeader("TX ID", "Type", "Amount", "Status");
 
-    // Pop from stack - displays newest first
-    while (!txStack.isEmpty()) {
-        Transaction tx = txStack.pop();  // LIFO - most recent first
+    // Clone stack to preserve original data
+    @SuppressWarnings("unchecked")
+    Stack<Transaction> tempStack = (Stack<Transaction>) txStack.clone();
+
+    // Pop from cloned stack - displays newest first, preserves original
+    while (!tempStack.isEmpty()) {
+        Transaction tx = tempStack.pop();  // LIFO - most recent first
         String txId = tx.getTxId();
         String type = tx.getType().toString();
         String amount = "$" + String.format("%.2f", tx.getAmount());
@@ -611,15 +583,15 @@ Total Transactions: 5
 └────────┴───────────┴──────────┴───────────┘
 ```
 
-**Conversion Process:**
+**Direct Stack Storage:**
 
 ```
-LinkedList (chronological order):
-[TX001, TX002, TX003, TX004, TX005]
-         ↓ Convert to Stack ↓
+Transactions added via push() in chronological order:
+push(TX001), push(TX002), push(TX003), push(TX004), push(TX005)
+
 Stack (LIFO - newest on top):
 ┌──────┐
-│ TX005│  ← Top (most recent)
+│ TX005│  ← Top (most recent) - added last
 ├──────┤
 │ TX004│
 ├──────┤
@@ -627,7 +599,7 @@ Stack (LIFO - newest on top):
 ├──────┤
 │ TX002│
 ├──────┤
-│ TX001│  ← Bottom (oldest)
+│ TX001│  ← Bottom (oldest) - added first
 └──────┘
 
 Pop operations yield: TX005, TX004, TX003, TX002, TX001 ✓
@@ -995,15 +967,15 @@ This Banking Management System demonstrates comprehensive data structure knowled
 
 ### Data Structures (15 points)
 
-**✅ LinkedList (4 instances):**
+**✅ LinkedList (3 instances):**
 - User registry - sequential access, rare additions
 - Customer storage - iteration-heavy, rare deletions
 - Account storage - filtering by customer, sorting
-- Transaction history - append-only, chronological
 
-**✅ Stack (2 instances):**
+**✅ Stack (3 instances):**
 - Audit trail - LIFO display (newest first)
-- Transaction history - reverse chronological view
+- Transaction history (per account) - direct LIFO storage and display
+- Transaction history display - cloned stack for viewing
 
 **✅ ArrayList (1 instance):**
 - Menu building - indexed access, dynamic sizing

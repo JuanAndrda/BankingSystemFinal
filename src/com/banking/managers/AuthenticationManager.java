@@ -323,6 +323,21 @@ public class AuthenticationManager {
         }
     }
 
+    public boolean deleteUserByCustomerId(String customerId) {
+        // Find UserAccount linked to this customer ID and delete it
+        for (User user : userRegistry) {
+            if (user instanceof UserAccount) {
+                UserAccount userAccount = (UserAccount) user;
+                if (userAccount.getLinkedCustomerId().equals(customerId)) {
+                    userRegistry.remove(user);
+                    logAction(user.getUsername(), user.getUserRole(), "USER_DELETED", "User account deleted (customer " + customerId + " removed)");
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public void displayAuditTrail() {
         if (auditTrail.isEmpty()) {
             System.out.println("No audit logs available.");
@@ -334,7 +349,6 @@ public class AuthenticationManager {
         System.out.println("╚═══════════════════════════════════════════════════════════════════════════════╝\n");
 
         // Clone the stack to preserve original data (Stack extends Vector, so clone() works)
-        @SuppressWarnings("unchecked")
         Stack<AuditLog> tempStack = (Stack<AuditLog>) auditTrail.clone();
 
         // Pop from stack to display most recent first (LIFO behavior)

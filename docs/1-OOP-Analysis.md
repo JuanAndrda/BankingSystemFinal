@@ -153,14 +153,14 @@ public abstract class Account {
     private String accountNo;
     private double balance;
     private Customer owner;
-    private LinkedList<Transaction> transactionHistory;
+    private Stack<Transaction> transactionHistory;
 
     // Constructor
     public Account(String accountNo, Customer owner) {
         this.setAccountNo(accountNo);
         this.setOwner(owner);
         this.balance = 0.0;
-        this.transactionHistory = new LinkedList<>();
+        this.transactionHistory = new Stack<>();
     }
 
     // Public getter - read-only access
@@ -470,13 +470,13 @@ public abstract class Account {
     private String accountNo;
     private double balance;
     private Customer owner;
-    private LinkedList<Transaction> transactionHistory;
+    private Stack<Transaction> transactionHistory;
 
     public Account(String accountNo, Customer owner) {
         this.setAccountNo(accountNo);
         this.setOwner(owner);
         this.balance = 0.0;
-        this.transactionHistory = new LinkedList<>();
+        this.transactionHistory = new Stack<>();
     }
 
     // Common methods inherited by all account types
@@ -492,7 +492,7 @@ public abstract class Account {
         return this.owner;
     }
 
-    public LinkedList<Transaction> getTransactionHistory() {
+    public Stack<Transaction> getTransactionHistory() {
         return this.transactionHistory;
     }
 
@@ -513,7 +513,7 @@ public abstract class Account {
 
     // Common transaction method
     public void addTransaction(Transaction t) {
-        this.transactionHistory.add(t);
+        this.transactionHistory.push(t);
     }
 
     // Protected validation helper
@@ -722,7 +722,7 @@ public abstract class Account {
     private String accountNo;
     private double balance;
     private Customer owner;
-    private LinkedList<Transaction> transactionHistory;
+    private Stack<Transaction> transactionHistory;
 
     // Concrete method - shared by all accounts
     public void deposit(double amount) {
@@ -737,7 +737,7 @@ public abstract class Account {
 
     // Concrete method
     public void addTransaction(Transaction t) {
-        this.transactionHistory.add(t);
+        this.transactionHistory.push(t);
     }
 }
 ```
@@ -1148,7 +1148,7 @@ public abstract class Account {
     private String accountNo;
     private double balance;
     private Customer owner;  // Reference to owner Customer object
-    private LinkedList<Transaction> transactionHistory;
+    private Stack<Transaction> transactionHistory;
 
     public Customer getOwner() {
         return this.owner;
